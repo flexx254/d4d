@@ -190,25 +190,25 @@
     };
 
     const rateChart = {
-      bolt: {
-        Economy: { baseFare: 50, perKm: 30, perMin: 2, minFare: 150 },
-        Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200 },
-        Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300 }
-      },
-      uber: {
-        UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160 },
-        UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220 },
-        UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350 }
-      },
-      faras: {
-        Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140 },
-        Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190 },
-        Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310 }
-      },
-      extended: {
-        baseFare: 60, perKm: 35, perMin: 3, minFare: 170
-      }
-    };
+  bolt: {
+    Economy: { baseFare: 50, perKm: 30, perMin: 2, minFare: 150, minKm: 1 },
+    Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200, minKm: 3 },
+    Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300, minKm: 3 }
+  },
+  uber: {
+    UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160, minKm: 3 },
+    UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220, minKm: 3 },
+    UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350, minKm: 3 }
+  },
+  faras: {
+    Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140, minKm: 3 },
+    Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190, minKm: 3 },
+    Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310, minKm: 3 }
+  },
+  extended: {
+    baseFare: 60, perKm: 35, perMin: 3, minFare: 170, minKm: 3
+  }
+};
 
     function selectService(service) {
       selectedService = service;
@@ -238,19 +238,23 @@
       const totalMinutes = hh * 60 + mm + ss / 60;
 
       if (selectedService === 'extended') {
-        const r = rateChart.extended;
-        fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
-        if (fare < r.minFare) fare = r.minFare;
-      } else {
-        const category = document.getElementById('categorySelect').value;
-        const r = rateChart[selectedService][category];
-        if (!r) {
-          alert('Invalid category selected.');
-          return;
-        }
-        fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
-        if (fare < r.minFare) fare = r.minFare;
-      }
+  const r = rateChart.extended;
+  fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
+  if (finalDistance < r.minKm || fare < r.minFare) {
+    fare = r.minFare;
+  }
+} else {
+  const category = document.getElementById('categorySelect').value;
+  const r = rateChart[selectedService][category];
+  if (!r) {
+    alert('Invalid category selected.');
+    return;
+  }
+  fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
+  if (finalDistance < r.minKm || fare < r.minFare) {
+    fare = r.minFare;
+  }
+}
 
       const finalFare = fare.toFixed(2);
       document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
