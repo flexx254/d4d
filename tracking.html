@@ -258,7 +258,16 @@
       startTracking();
     };
 
-    document.querySelector('.stop-btn').addEventListener('click', stopTracking);
+  
+  document.querySelector('.stop-btn').addEventListener('click', stopTracking);
+ document.querySelector('.stop-btn').addEventListener('click', () => {
+    stopTracking();
+
+    // Save finalTime and finalDistance independently to localStorage
+    localStorage.setItem('finalTime', finalTime);
+    localStorage.setItem('finalDistance', finalDistance);
+  });
+
   </script>
 </body>
 </html>
