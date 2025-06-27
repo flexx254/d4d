@@ -69,12 +69,14 @@
       trips.forEach((trip, index) => {
         const div = document.createElement('div');
         div.className = 'trip';
-        div.innerHTML = `
-          <strong>Trip ${index + 1}</strong><br>
-          <span>Date: ${trip.date || 'N/A'}</span><br>
-          Time: ${trip.time}<br>
-          Distance: ${trip.distance} km
-        `;
+       div.innerHTML = `
+  <strong>Trip ${index + 1}</strong><br>
+  <span>Date: ${trip.date || 'N/A'}</span><br>
+  Start Time: ${trip.startTime || 'N/A'}<br>
+  End Time: ${trip.endTime || 'N/A'}<br>
+  Duration: ${trip.time || 'N/A'}<br>
+  Distance: ${trip.distance} km
+`; 
         div.onclick = () => showOnMap(trip.route);
         tripList.appendChild(div);
       });
