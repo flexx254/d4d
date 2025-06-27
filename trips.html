@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Trips</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      background: #4caf50;
+      color: white;
+      padding: 16px;
+      margin: 0;
+    }
+
+    #tripList {
+      padding: 20px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .trip {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .trip:hover {
+      background: #e6ffe6;
+    }
+
+    #map {
+      height: 50vh;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Trips</h1>
+  <div id="tripList"></div>
+  <div id="map"></div>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibW9zZXRpMjU0IiwiYSI6ImNsanh1bWRzNTB5ZG0zZnA0Z3d3Z3A3amsifQ.ff8FbR0WNQ2-yBIuKb9zCw'; // replace with your token
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [36.8219, -1.2921],
+      zoom: 14
+    });
+
+    const tripList = document.getElementById('tripList');
+    const trips = JSON.parse(localStorage.getItem('trips')) || [];
+
+    if (trips.length === 0) {
+      tripList.innerHTML = '<p style="text-align:center; color:#888;">No trips found yet.</p>';
+    } else {
+      trips.forEach((trip, index) => {
+        const div = document.createElement('div');
+        div.className = 'trip';
+        div.innerHTML = `
+          <strong>Trip ${index + 1}</strong><br>
+          <span>Date: ${trip.date || 'N/A'}</span><br>
+          Time: ${trip.time}<br>
+          Distance: ${trip.distance} km
+        `;
+        div.onclick = () => showOnMap(trip.route);
+        tripList.appendChild(div);
+      });
+    }
+
+    function showOnMap(coords) {
+      if (!coords || coords.length < 2) return;
+
+      map.flyTo({ center: coords[0], zoom: 15 });
+
+      if (map.getSource('tripPath')) {
+        map.getSource('tripPath').setData({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: coords
+          }
+        });
+      } else {
+        map.addSource('tripPath', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: coords
+            }
+          }
+        });
+
+        map.addLayer({
+          id: 'tripPath',
+          type: 'line',
+          source: 'tripPath',
+          paint: {
+            'line-color': '#ff0000',
+            'line-width': 4
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
