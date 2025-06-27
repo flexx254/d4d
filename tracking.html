@@ -150,7 +150,7 @@
       tracking = true;
       route = [];
       distance = 0;
-      startTime = Date.now();
+      startTime = new Date();
       updateTimer();
       watchId = navigator.geolocation.watchPosition(onLocationUpdate, null, {
         enableHighAccuracy: true
@@ -175,14 +175,16 @@
       console.log("Tracking stopped.");
       console.log("Final Time:", finalTime);
       console.log("Final Distance:", finalDistance, "km");
-  
+  const endTime = new Date();
     // Save summary + coordinates
   const trip = {
-    date: new Date().toLocaleDateString(),
-    time: finalTime,
-    distance: finalDistance,
-    route: [...route]
-  };
+  date: new Date().toLocaleDateString(),
+  startTime: startTime.toLocaleTimeString(),
+  endTime: endTime.toLocaleTimeString(),
+  time: finalTime,
+  distance: finalDistance,
+  route: [...route]
+};
 
   let trips = JSON.parse(localStorage.getItem('trips')) || [];
   trips.push(trip);
