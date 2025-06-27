@@ -269,68 +269,64 @@
   });
 
 
-  function speakWarning(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.volume = 1;
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    speechSynthesis.speak(utterance);
+  
+function speakWarning(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.volume = 1;
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  speechSynthesis.speak(utterance);
+}
+
+// 👀 Independent Watchdog Setup
+(function () {
+  const lastUpdate = {
+    timer: Date.now(),
+    km: Date.now()
+  };
+
+  // You call this whenever your timer or distance updates
+  function watchdogUpdate(type) {
+    if (lastUpdate[type]) {
+      lastUpdate[type] = Date.now();
+    }
   }
+
+  function beep() {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    osc.connect(ctx.destination);
+    osc.frequency.value = 800;
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
     
-  // 👀 Independent Watchdog Setup
-  (function () {
-    const lastUpdate = {
-      timer: Date.now(),
-      km: Date.now()
-    };
+    // Speak immediately after beep
+    speakWarning("Warning. D 4 D monitor asleep. Please bring the app forward.");
+  }
 
-    // You call this whenever your timer or distance updates
-    function watchdogUpdate(type) {
-      if (lastUpdate[type]) {
-        lastUpdate[type] = Date.now();
-      }
+  setInterval(() => {
+    const now = Date.now();
+    const threshold = 7000;
+
+    if (now - lastUpdate.timer > threshold || now - lastUpdate.km > threshold) {
+      console.warn("⚠️ Update stalled!");
+      beep(); // Beep every 3 seconds during stall, with voice
     }
+  }, 3000);
 
-    // Optional: use beep instead of alert
-    function beep() {
-  const ctx = new AudioContext();
-  const osc = ctx.createOscillator();
-  osc.connect(ctx.destination);
-  osc.frequency.value = 800;
-  osc.start();
-  osc.stop(ctx.currentTime + 0.3);
+  const origUpdateTimer = updateTimer;
+  updateTimer = function () {
+    watchdogUpdate("timer");
+    origUpdateTimer.apply(this, arguments);
+  };
 
-  // 🗣️ Add voice here
-  speakWarning("Warning. D 4 D monitor asleep. Please bring the screen forward.");
-    }
-
-    // Check for stalled updates
-    setInterval(() => {
-      const now = Date.now();
-      const threshold = 7000;
-
-      if (now - lastUpdate.timer > threshold || now - lastUpdate.km > threshold) {
-        console.warn("⚠️ Update stalled!");
-        // alert("⚠️ Timer or GPS update paused!");
-        beep(); // safer alternative to alert
-      }
-    }, 3000);
-
-    // Hook into your existing logic *without changing it*
-    const origUpdateTimer = updateTimer;
-    updateTimer = function () {
-      watchdogUpdate("timer");
-      origUpdateTimer.apply(this, arguments);
-    };
-
-    const origOnLocationUpdate = onLocationUpdate;
-    onLocationUpdate = function () {
-      watchdogUpdate("km");
-      origOnLocationUpdate.apply(this, arguments);
-    };
-  })();
-
+  const origOnLocationUpdate = onLocationUpdate;
+  onLocationUpdate = function () {
+    watchdogUpdate("km");
+    origOnLocationUpdate.apply(this, arguments);
+  };
+})()
 
   </script>
 </body>
