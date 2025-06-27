@@ -173,7 +173,22 @@
       console.log("Tracking stopped.");
       console.log("Final Time:", finalTime);
       console.log("Final Distance:", finalDistance, "km");
-    }
+  
+    // Save summary + coordinates
+  const trip = {
+    date: new Date().toLocaleDateString(),
+    time: finalTime,
+    distance: finalDistance,
+    route: [...route]
+  };
+
+  let trips = JSON.parse(localStorage.getItem('trips')) || [];
+  trips.push(trip);
+
+  if (trips.length > 100) trips = trips.slice(trips.length - 100); // FIFO: keep latest 100
+
+  localStorage.setItem('trips', JSON.stringify(trips));
+  }
 
   function registerCoordinate(lngLat) {
   route.push(lngLat); // Store the coordinates in the route array
