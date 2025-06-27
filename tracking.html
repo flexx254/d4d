@@ -293,18 +293,26 @@ function speakWarning(text) {
     }
   }
 
-  function beep() {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    osc.connect(ctx.destination);
-    osc.frequency.value = 800;
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-    
-    // Speak immediately after beep
-    speakWarning("Warning. D 4 D monitor asleep. Please bring the app forward.");
-  }
+  
+function beepAndSpeak() {
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
 
+  osc.frequency.value = 440; // Lower pitch
+  gain.gain.value = 0.1;     // Lower volume
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.2); // Short beep
+
+  // Speak after beep ends
+  setTimeout(() => {
+    speakWarning("Warning. D 4 D monitor asleep. Please bring the app forward.");
+  }, 250); // Delay in ms to let beep finish
+}
   setInterval(() => {
     const now = Date.now();
     const threshold = 7000;
