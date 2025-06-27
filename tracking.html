@@ -175,25 +175,26 @@
       console.log("Final Distance:", finalDistance, "km");
     }
 
-    function onLocationUpdate(position) {
-      const { latitude, longitude } = position.coords;
-      const lngLat = [longitude, latitude];
+  
+function onLocationUpdate(position) {
+  const { latitude, longitude } = position.coords;
+  const lngLat = [longitude, latitude];
 
-      map.setCenter(lngLat);
+  map.setCenter(lngLat);
 
-      if (!marker) {
-        marker = new mapboxgl.Marker({ color: 'red' }).setLngLat(lngLat).addTo(map);
-      } else {
-        marker.setLngLat(lngLat);
-      }
+  if (!marker) {
+    marker = new mapboxgl.Marker({ color: 'red' }).setLngLat(lngLat).addTo(map);
+  } else {
+    marker.setLngLat(lngLat);
+  }
 
-      route.push(lngLat);
-      if (route.length > 1) {
-        distance += getDistance(route[route.length - 2], route[route.length - 1]);
-        updateLine();
-      }
+  registerCoordinate(lngLat); // Push to route array
+
+  if (route.length > 1) {
+    distance += getDistance(route[route.length - 2], route[route.length - 1]);
+    updateLine();
+  }
     }
-
     function updateLine() {
       if (map.getSource('path')) {
         map.getSource('path').setData({
