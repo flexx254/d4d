@@ -175,7 +175,10 @@
       console.log("Final Distance:", finalDistance, "km");
     }
 
-  
+  function registerCoordinate(lngLat) {
+  route.push(lngLat); // Store the coordinates in the route array
+  console.log("Coordinate registered:", lngLat);
+}
 function onLocationUpdate(position) {
   const { latitude, longitude } = position.coords;
   const lngLat = [longitude, latitude];
