@@ -263,16 +263,12 @@ function onLocationUpdate(position) {
     };
 
   
-  document.querySelector('.stop-btn').addEventListener('click', stopTracking);
- document.querySelector('.stop-btn').addEventListener('click', () => {
-    stopTracking();
 
-    // Save finalTime and finalDistance independently to localStorage
-    localStorage.setItem('finalTime', finalTime);
-    localStorage.setItem('finalDistance', finalDistance);
-  });
-
-
+document.querySelector('.stop-btn').addEventListener('click', () => {
+  stopTracking();
+  localStorage.setItem('finalTime', finalTime);
+  localStorage.setItem('finalDistance', finalDistance);
+});
 
     function speakWarning(text) {
   const utterance = new SpeechSynthesisUtterance(text);
