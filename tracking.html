@@ -268,7 +268,8 @@ document.querySelector('.stop-btn').addEventListener('click', () => {
   stopTracking();
   localStorage.setItem('finalTime', finalTime);
   localStorage.setItem('finalDistance', finalDistance);
-});
+  localStorage.setItem('route', JSON.stringify(route));
+ });
 
     function speakWarning(text) {
   const utterance = new SpeechSynthesisUtterance(text);
