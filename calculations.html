@@ -259,6 +259,7 @@
       const finalFare = fare.toFixed(2);
       document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
       localStorage.setItem('finalFare', finalFare);
+
       // Create readable label like "Bolt - Economy KES 300.00"
 let label = selectedService.charAt(0).toUpperCase() + selectedService.slice(1);
 if (selectedService !== 'extended') {
@@ -267,11 +268,26 @@ if (selectedService !== 'extended') {
 }
 label += ` KES ${finalFare}`;
 
+      
+
 // Save to localStorage so trips.html can read it
 localStorage.setItem('finalFareLabel', label);
       document.getElementById('fareOverlay').style.display = 'flex';
     });
 
+    
+// ✅ Update the last trip in trips array with fare, app, and category
+const trips = JSON.parse(localStorage.getItem('trips')) || [];
+if (trips.length > 0) {
+  const lastTrip = trips[trips.length - 1];
+  lastTrip.fare = finalFare;
+  lastTrip.app = selectedService;
+  if (selectedService !== 'extended') {
+    lastTrip.category = document.getElementById('categorySelect').value;
+  }
+  trips[trips.length - 1] = lastTrip;
+  localStorage.setItem('trips', JSON.stringify(trips));
+}
     function closeOverlay() {
       document.getElementById('fareOverlay').style.display = 'none';
     }
