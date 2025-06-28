@@ -157,8 +157,7 @@
       });
     }
 
-   
-function stopTracking() {
+   function stopTracking() {
   tracking = false;
   navigator.geolocation.clearWatch(watchId);
   clearTimeout(timerTimeout);
@@ -186,14 +185,20 @@ function stopTracking() {
     category: null
   };
 
-  // Save latest trip for calculations page to update
+  // ✅ Append to trips array
+  const trips = JSON.parse(localStorage.getItem('trips')) || [];
+  trips.push(trip);
+  localStorage.setItem('trips', JSON.stringify(trips));
+
+  // Optional: Also save separately
   localStorage.setItem('lastTrip', JSON.stringify(trip));
   localStorage.setItem('finalTime', finalTime);
   localStorage.setItem('finalDistance', finalDistance);
   localStorage.setItem('route', JSON.stringify(route));
 
-  console.log("🕹️ Trip ended, waiting for fare/app/category to be added in calculations.html");
+  console.log("🕹️ Trip ended and added to trips array for trips.html");
 }
+
     
 function onLocationUpdate(position) {
   const { latitude, longitude } = position.coords;
