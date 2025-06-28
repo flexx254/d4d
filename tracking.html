@@ -176,6 +176,7 @@
       console.log("Final Time:", finalTime);
       console.log("Final Distance:", finalDistance, "km");
   const endTime = new Date();
+      const finalFareLabel = localStorage.getItem('finalFareLabel') || 'N/A';
     // Save summary + coordinates
   const trip = {
   date: new Date().toLocaleDateString(),
@@ -184,6 +185,8 @@
   time: finalTime,
   distance: finalDistance,
   route: [...route]
+    fare: finalFareLabel
+    
 };
 
   let trips = JSON.parse(localStorage.getItem('trips')) || [];
