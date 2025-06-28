@@ -84,40 +84,8 @@
 
     
 
-let startMarker, endMarker;
 
-function showOnMap(coords) {
-  if (!coords || coords.length < 2) return;
 
-  map.flyTo({ center: coords[0], zoom: 15 });
-
-  // Draw route
-  const routeData = {
-    type: 'Feature',
-    geometry: {
-      type: 'LineString',
-      coordinates: coords
-    }
-  };
-
-  if (map.getSource('tripPath')) {
-    map.getSource('tripPath').setData(routeData);
-  } else {
-    map.addSource('tripPath', {
-      type: 'geojson',
-      data: routeData
-    });
-
-    map.addLayer({
-      id: 'tripPath',
-      type: 'line',
-      source: 'tripPath',
-      paint: {
-        'line-color': '#ff0000',
-        'line-width': 4
-      }
-    });
-  }
 
 let startMarker, endMarker;
 
@@ -126,7 +94,6 @@ function showOnMap(coords) {
 
   map.flyTo({ center: coords[0], zoom: 15 });
 
-  // Draw route
   const routeData = {
     type: 'Feature',
     geometry: {
@@ -135,6 +102,7 @@ function showOnMap(coords) {
     }
   };
 
+  // Draw route
   if (map.getSource('tripPath')) {
     map.getSource('tripPath').setData(routeData);
   } else {
@@ -161,7 +129,7 @@ function showOnMap(coords) {
   const startCoord = coords[0];
   const endCoord = coords[coords.length - 1];
 
-  // Add Start Marker (Green) with Popup
+  // Add Start Marker with popup
   startMarker = new mapboxgl.Marker({ color: 'green' })
     .setLngLat(startCoord)
     .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
@@ -170,7 +138,7 @@ function showOnMap(coords) {
     .addTo(map)
     .togglePopup();
 
-  // Add End Marker (Red) with Popup
+  // Add End Marker with popup
   endMarker = new mapboxgl.Marker({ color: 'red' })
     .setLngLat(endCoord)
     .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
@@ -178,7 +146,8 @@ function showOnMap(coords) {
     ))
     .addTo(map)
     .togglePopup();
-    }
+}
+
   </script>
 </body>
 </html>
