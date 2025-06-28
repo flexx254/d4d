@@ -118,6 +118,58 @@
         });
       }
     }
+
+
+let startMarker, endMarker;
+
+function showOnMap(coords) {
+  if (!coords || coords.length < 2) return;
+
+  map.flyTo({ center: coords[0], zoom: 15 });
+
+  // Draw route
+  const routeData = {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: coords
+    }
+  };
+
+  if (map.getSource('tripPath')) {
+    map.getSource('tripPath').setData(routeData);
+  } else {
+    map.addSource('tripPath', {
+      type: 'geojson',
+      data: routeData
+    });
+
+    map.addLayer({
+      id: 'tripPath',
+      type: 'line',
+      source: 'tripPath',
+      paint: {
+        'line-color': '#ff0000',
+        'line-width': 4
+      }
+    });
+  }
+
+  // Remove previous markers
+  if (startMarker) startMarker.remove();
+  if (endMarker) endMarker.remove();
+
+  // Add Start Marker (Green)
+  startMarker = new mapboxgl.Marker({ color: 'green' })
+    .setLngLat(coords[0])
+    .addTo(map);
+
+  // Add End Marker (Red)
+  endMarker = new mapboxgl.Marker({ color: 'red' })
+    .setLngLat(coords[coords.length - 1])
+    .addTo(map);
+    }
+    
   </script>
 </body>
 </html>
