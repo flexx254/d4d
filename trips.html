@@ -82,43 +82,7 @@
       });
     }
 
-    function showOnMap(coords) {
-      if (!coords || coords.length < 2) return;
-
-      map.flyTo({ center: coords[0], zoom: 15 });
-
-      if (map.getSource('tripPath')) {
-        map.getSource('tripPath').setData({
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates: coords
-          }
-        });
-      } else {
-        map.addSource('tripPath', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'LineString',
-              coordinates: coords
-            }
-          }
-        });
-
-        map.addLayer({
-          id: 'tripPath',
-          type: 'line',
-          source: 'tripPath',
-          paint: {
-            'line-color': '#ff0000',
-            'line-width': 4
-          }
-        });
-      }
-    }
-
+    
 
 let startMarker, endMarker;
 
@@ -155,6 +119,67 @@ function showOnMap(coords) {
     });
   }
 
+
+function showOnMap(coords) {
+  if (!coords || coords.length < 2) return;
+
+  map.flyTo({ center: coords[0], zoom: 15 });
+
+  const routeData = {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: coords
+    }
+  };
+
+  // Draw route
+  if (map.getSource('tripPath')) {
+    map.getSource('tripPath').setData(routeData);
+  } else {
+    map.addSource('tripPath', {
+      type: 'geojson',
+      data: routeData
+    });
+
+    map.addLayer({
+      id: 'tripPath',
+      type: 'line',
+      source: 'tripPath',
+      paint: {
+        'line-color': '#ff0000',
+        'line-width': 4
+      }
+    });
+  }
+
+  // Remove old markers
+  if (startMarker) startMarker.remove();
+  if (endMarker) endMarker.remove();
+
+  const startCoord = coords[0];
+  const endCoord = coords[coords.length - 1];
+
+  // Add Start Marker with popup
+  startMarker = new mapboxgl.Marker({ color: 'green' })
+    .setLngLat(startCoord)
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
+      `Start: Lat ${startCoord[1].toFixed(5)}, Lng ${startCoord[0].toFixed(5)}`
+    ))
+    .addTo(map)
+    .togglePopup(); // Show immediately
+
+  // Add End Marker with popup
+  endMarker = new mapboxgl.Marker({ color: 'red' })
+    .setLngLat(endCoord)
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
+      `End: Lat ${endCoord[1].toFixed(5)}, Lng ${endCoord[0].toFixed(5)}`
+    ))
+    .addTo(map)
+    .togglePopup(); // Show immediately
+}
+
+    
   // Remove previous markers
   if (startMarker) startMarker.remove();
   if (endMarker) endMarker.remove();
