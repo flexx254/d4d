@@ -83,10 +83,6 @@
     }
 
     
-
-
-
-
 let startMarker, endMarker;
 
 function showOnMap(coords) {
@@ -102,7 +98,7 @@ function showOnMap(coords) {
     }
   };
 
-  // Draw route
+  // Draw or update trip path
   if (map.getSource('tripPath')) {
     map.getSource('tripPath').setData(routeData);
   } else {
@@ -129,25 +125,26 @@ function showOnMap(coords) {
   const startCoord = coords[0];
   const endCoord = coords[coords.length - 1];
 
-  // Add Start Marker with popup
+  // 🟢 Start Marker with Google Maps link
   startMarker = new mapboxgl.Marker({ color: 'green' })
     .setLngLat(startCoord)
-    .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
-      `Start: Lat ${startCoord[1].toFixed(5)}, Lng ${startCoord[0].toFixed(5)}`
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(
+      `Start: Lat ${startCoord[1].toFixed(5)}, Lng ${startCoord[0].toFixed(5)}<br>
+       <a href="https://www.google.com/maps?q=${startCoord[1]},${startCoord[0]}" target="_blank" style="color:blue;">View on Google Maps</a>`
     ))
     .addTo(map)
     .togglePopup();
 
-  // Add End Marker with popup
+  // 🔴 End Marker with Google Maps link
   endMarker = new mapboxgl.Marker({ color: 'red' })
     .setLngLat(endCoord)
-    .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
-      `End: Lat ${endCoord[1].toFixed(5)}, Lng ${endCoord[0].toFixed(5)}`
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(
+      `End: Lat ${endCoord[1].toFixed(5)}, Lng ${endCoord[0].toFixed(5)}<br>
+       <a href="https://www.google.com/maps?q=${endCoord[1]},${endCoord[0]}" target="_blank" style="color:blue;">View on Google Maps</a>`
     ))
     .addTo(map)
     .togglePopup();
-}
-
+    }
   </script>
 </body>
 </html>
