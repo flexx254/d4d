@@ -272,11 +272,8 @@ label += ` KES ${finalFare}`;
 
 // Save to localStorage so trips.html can read it
 localStorage.setItem('finalFareLabel', label);
-      document.getElementById('fareOverlay').style.display = 'flex';
-    });
 
-    
-// ✅ Update the last trip in trips array with fare, app, and category
+// ✅ Now update the last trip in the trips array
 const trips = JSON.parse(localStorage.getItem('trips')) || [];
 if (trips.length > 0) {
   const lastTrip = trips[trips.length - 1];
@@ -288,6 +285,11 @@ if (trips.length > 0) {
   trips[trips.length - 1] = lastTrip;
   localStorage.setItem('trips', JSON.stringify(trips));
 }
+      document.getElementById('fareOverlay').style.display = 'flex';
+    });
+
+    
+
     function closeOverlay() {
       document.getElementById('fareOverlay').style.display = 'none';
     }
