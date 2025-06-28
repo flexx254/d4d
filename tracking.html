@@ -281,11 +281,26 @@ function onLocationUpdate(position) {
       return n.toString().padStart(2, '0');
     }
 
+    
+
     window.onload = () => {
       startTracking();
     };
 
-  
+  function waitUntilReady(callback, retries = 20) {
+  const fare = localStorage.getItem('finalFareLabel');
+  const app = localStorage.getItem('rideApp');
+  const category = localStorage.getItem('rideCategory');
+
+  if (fare && app && category) {
+    callback();
+  } else if (retries > 0) {
+    setTimeout(() => waitUntilReady(callback, retries - 1), 300); // Retry every 300ms
+  } else {
+    console.warn("⚠️ Timeout: Trip saved without complete data.");
+    callback(); // Save anyway if data is still missing
+  }
+}
 
 document.querySelector('.stop-btn').addEventListener('click', () => {
   stopTracking();
