@@ -201,6 +201,22 @@
   });
     } 
 
+
+    function waitUntilReady(callback, retries = 20) {
+  const fare = localStorage.getItem('finalFareLabel');
+  const app = localStorage.getItem('rideApp');
+  const category = localStorage.getItem('rideCategory');
+
+  if (fare && app && category) {
+    callback();
+  } else if (retries > 0) {
+    setTimeout(() => waitUntilReady(callback, retries - 1), 300);
+  } else {
+    console.warn("Trip saved without full data.");
+    callback(); // proceed anyway
+  }
+      }
+
   let trips = JSON.parse(localStorage.getItem('trips')) || [];
   trips.push(trip);
 
