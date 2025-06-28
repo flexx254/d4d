@@ -75,7 +75,8 @@
   Start Time: ${trip.startTime || 'N/A'}<br>
   End Time: ${trip.endTime || 'N/A'}<br>
   Duration: ${trip.time || 'N/A'}<br>
-  Distance: ${trip.distance} km
+  Distance: ${trip.distance} km <br>
+  <strong>Fare: ${trip.fare || 'N/A'}</strong>
 `; 
         div.onclick = () => showOnMap(trip.route);
         tripList.appendChild(div);
