@@ -259,6 +259,16 @@
       const finalFare = fare.toFixed(2);
       document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
       localStorage.setItem('finalFare', finalFare);
+      // Create readable label like "Bolt - Economy KES 300.00"
+let label = selectedService.charAt(0).toUpperCase() + selectedService.slice(1);
+if (selectedService !== 'extended') {
+  const category = document.getElementById('categorySelect').value;
+  label += ` - ${category}`;
+}
+label += ` KES ${finalFare}`;
+
+// Save to localStorage so trips.html can read it
+localStorage.setItem('finalFareLabel', label);
       document.getElementById('fareOverlay').style.display = 'flex';
     });
 
