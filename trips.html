@@ -119,12 +119,14 @@ function showOnMap(coords) {
     });
   }
 
+let startMarker, endMarker;
 
 function showOnMap(coords) {
   if (!coords || coords.length < 2) return;
 
   map.flyTo({ center: coords[0], zoom: 15 });
 
+  // Draw route
   const routeData = {
     type: 'Feature',
     geometry: {
@@ -133,7 +135,6 @@ function showOnMap(coords) {
     }
   };
 
-  // Draw route
   if (map.getSource('tripPath')) {
     map.getSource('tripPath').setData(routeData);
   } else {
@@ -153,48 +154,31 @@ function showOnMap(coords) {
     });
   }
 
-  // Remove old markers
+  // Remove previous markers
   if (startMarker) startMarker.remove();
   if (endMarker) endMarker.remove();
 
   const startCoord = coords[0];
   const endCoord = coords[coords.length - 1];
 
-  // Add Start Marker with popup
+  // Add Start Marker (Green) with Popup
   startMarker = new mapboxgl.Marker({ color: 'green' })
     .setLngLat(startCoord)
     .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
       `Start: Lat ${startCoord[1].toFixed(5)}, Lng ${startCoord[0].toFixed(5)}`
     ))
     .addTo(map)
-    .togglePopup(); // Show immediately
+    .togglePopup();
 
-  // Add End Marker with popup
+  // Add End Marker (Red) with Popup
   endMarker = new mapboxgl.Marker({ color: 'red' })
     .setLngLat(endCoord)
     .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(
       `End: Lat ${endCoord[1].toFixed(5)}, Lng ${endCoord[0].toFixed(5)}`
     ))
     .addTo(map)
-    .togglePopup(); // Show immediately
-}
-
-    
-  // Remove previous markers
-  if (startMarker) startMarker.remove();
-  if (endMarker) endMarker.remove();
-
-  // Add Start Marker (Green)
-  startMarker = new mapboxgl.Marker({ color: 'green' })
-    .setLngLat(coords[0])
-    .addTo(map);
-
-  // Add End Marker (Red)
-  endMarker = new mapboxgl.Marker({ color: 'red' })
-    .setLngLat(coords[coords.length - 1])
-    .addTo(map);
+    .togglePopup();
     }
-    
   </script>
 </body>
 </html>
