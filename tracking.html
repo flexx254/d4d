@@ -340,9 +340,15 @@ function onLocationUpdate(position) {
 })();
 
 
- document.querySelector('.stop-btn').addEventListener('click', () => {
+ document.querySelector('.stop-btn').addEventListener('click', (event) => {
+  event.preventDefault(); // prevent navigation for a moment
   stopTracking();
-}); 
+
+  // Slight delay before navigating
+  setTimeout(() => {
+    window.location.href = 'calculations.html';
+  }, 300); // adjust delay if needed
+});
 
 
   </script>
