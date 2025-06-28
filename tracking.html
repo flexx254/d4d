@@ -281,9 +281,11 @@ function onLocationUpdate(position) {
 
     
 
-    map.onload = () => {
-      startTracking();
-    };
+    map.on('load', () => {
+  startTracking();
+});
+      
+  
 
   
     function speakWarning(text) {
