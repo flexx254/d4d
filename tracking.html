@@ -157,37 +157,49 @@
       });
     }
 
-    function stopTracking() {
-      tracking = false;
-      navigator.geolocation.clearWatch(watchId);
-      clearTimeout(timerTimeout);
+   function stopTracking() {
+  tracking = false;
+  navigator.geolocation.clearWatch(watchId);
+  clearTimeout(timerTimeout);
 
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const hours = Math.floor(elapsed / 3600000);
-      const minutes = Math.floor((elapsed % 3600000) / 60000);
-      const seconds = Math.floor((elapsed % 60000) / 1000);
-      finalTime = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-      finalDistance = distance.toFixed(2);
+  const now = Date.now();
+  const elapsed = now - startTime;
+  const hours = Math.floor(elapsed / 3600000);
+  const minutes = Math.floor((elapsed % 3600000) / 60000);
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+  finalTime = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  finalDistance = distance.toFixed(2);
+  infoBanner.textContent = `Timer: ${finalTime} | Distance: ${finalDistance} km`;
 
-      infoBanner.textContent = `Timer: ${finalTime} | Distance: ${finalDistance} km`;
+  console.log("Tracking stopped. Waiting for fare, app, category...");
 
-      console.log("Tracking stopped.");
-      console.log("Final Time:", finalTime);
-      console.log("Final Distance:", finalDistance, "km");
-  const endTime = new Date();
-      const finalFareLabel = localStorage.getItem('finalFareLabel') || 'N/A';
-    // Save summary + coordinates
-  const trip = {
-  date: new Date().toLocaleDateString(),
-  startTime: startTime.toLocaleTimeString(),
-  endTime: endTime.toLocaleTimeString(),
-  time: finalTime,
-  distance: finalDistance,
-  route: [...route],
-    fare: finalFareLabel
-    
-};
+  // Wait until fare, app, category are available
+  waitUntilReady(() => {
+    const finalFareLabel = localStorage.getItem('finalFareLabel') || 'N/A';
+    const rideApp = localStorage.getItem('rideApp') || 'Unknown';
+    const rideCategory = localStorage.getItem('rideCategory') || 'Unknown';
+    const endTime = new Date();
+
+    const trip = {
+      date: new Date().toLocaleDateString(),
+      startTime: startTime.toLocaleTimeString(),
+      endTime: endTime.toLocaleTimeString(),
+      time: finalTime,
+      distance: finalDistance,
+      route: [...route],
+      fare: finalFareLabel,
+      app: rideApp,
+      category: rideCategory
+    };
+
+    let trips = JSON.parse(localStorage.getItem('trips')) || [];
+    trips.push(trip);
+    if (trips.length > 100) trips = trips.slice(-100); // keep latest 100
+    localStorage.setItem('trips', JSON.stringify(trips));
+
+    console.log("✅ Trip saved:", trip);
+  });
+    } 
 
   let trips = JSON.parse(localStorage.getItem('trips')) || [];
   trips.push(trip);
