@@ -159,16 +159,6 @@
 
    
 
-    let trips = JSON.parse(localStorage.getItem('trips')) || [];
-    trips.push(trip);
-    if (trips.length > 100) trips = trips.slice(-100); // keep latest 100
-    localStorage.setItem('trips', JSON.stringify(trips));
-
-    console.log("✅ Trip saved:", trip);
-  });
-    } 
-
-
     
 function stopTracking() {
 tracking = false;
