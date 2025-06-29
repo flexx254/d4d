@@ -113,6 +113,15 @@
         </a>
   </div>
 
+
+<!-- ✅ Install Button -->
+<button id="installBtn" style="display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+background-color: #4caf50; color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 16px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;">
+  📲 Install D4D App
+</button>
+  
+
   <!-- Bottom Banner -->
   <div class="overlay bottom-banner">
     Welcome to D4D Monitor. Driver for drivers.
@@ -175,6 +184,33 @@
       .then(reg => console.log('✅ Service Worker registered:', reg.scope))
       .catch(err => console.error('❌ Registration failed:', err));
   });
+
+
+    // ✅ PWA Install Prompt Logic
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Prevent auto-prompt
+  deferredPrompt = e;
+
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) installBtn.style.display = 'block';
+});
+
+document.getElementById('installBtn').addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+      if (choice.outcome === 'accepted') {
+        console.log('✅ User installed the app');
+      } else {
+        console.log('❌ User dismissed the install prompt');
+      }
+      deferredPrompt = null;
+      document.getElementById('installBtn').style.display = 'none';
+    });
+  }
+});
                               }
   </script>
 </body>
