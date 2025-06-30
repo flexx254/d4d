@@ -1,6 +1,6 @@
 {
   "name": "D4D Map Loader",
-  "short_name": "D4D",
+  "short_name": "Driver for Drivers",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#178c43",
