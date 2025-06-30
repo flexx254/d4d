@@ -1,6 +1,7 @@
 {
-  "name": "D4D Map Loader",
+  "name": "Driver for Drivers",
   "short_name": "D4D",
+  "description": "D4D is a driver-focused taxi app that tracks trips.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#178c43",
