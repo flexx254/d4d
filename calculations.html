@@ -366,13 +366,5 @@ if (trips.length > 0) {
     document.getElementById("overlay-wrapper").style.display = "flex";
   }
 </script>
-  
-  <!-- Intercept Back Button to Jump to index.html -->
-<script>
-  history.pushState(null, null, location.href);
-  window.addEventListener('popstate', function () {
-    window.location.href = 'index.html';
-  });
-</script>
 </body>
 </html>
