@@ -379,7 +379,17 @@ background-color: #4caf50;
   </div>
 </div>
 
-<script>
+
+    <script>
+  // ✅ Check if the user came from index.html using sessionStorage
+  if (!sessionStorage.getItem("cameFromIndex")) {
+    window.location.href = "https://flexx254.github.io/d4d/index.html";
+  }
+
+  // Optionally clear the flag after first entry to force redirect on refresh
+  sessionStorage.removeItem("cameFromIndex");
+
+  // ✅ Mobile and browser checks
   function isMobile() {
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   }
@@ -389,19 +399,6 @@ background-color: #4caf50;
     return /Chrome/i.test(ua) || /Safari/i.test(ua);
   }
 
-  function isFromCorrectPage() {
-    const ref = document.referrer;
-    return ref === "https://flexx254.github.io/d4d/" || ref === "https://flexx254.github.io/d4d/index.html";
-  }
-
-  const path = window.location.pathname;
-
-  // ✅ Redirect if user opens either page directly
-  if ((path.includes("trialtrack.html") || path.includes("calculations.html")) && !isFromCorrectPage()) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
-  }
-
-  // ✅ Show overlay if browser/device conditions fail
   const messages = [];
 
   if (!isMobile()) {
@@ -410,8 +407,8 @@ background-color: #4caf50;
 
   if (!isAllowedBrowser()) {
     messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or 
-    <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>
-    Copy this link and open it there:<br><code>${location.href}</code>`);
+      <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>
+      Copy this link and open it there:<br><code>${location.href}</code>`);
   }
 
   if (messages.length > 0) {
@@ -425,7 +422,6 @@ background-color: #4caf50;
     document.getElementById("overlay-wrapper").style.display = "flex";
   }
 </script>
-    
 
 </body>
   </html>
