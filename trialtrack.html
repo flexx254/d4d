@@ -141,14 +141,6 @@ background-color: #4caf50;
   </div>
 
   <script>
-  // ✅ Check if user came from index.html using sessionStorage
-  if (!sessionStorage.getItem("cameFromIndex")) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
-  }
-
-  // 🧹 Clear the flag immediately to block page refresh reuse
-  sessionStorage.removeItem("cameFromIndex");
-  </script>
 
   <!-- Mapbox -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -377,6 +369,7 @@ background-color: #4caf50;
     });
 
   </script>
+
 <!-- Translucent black wrapper with white overlay box -->
 <div id="overlay-wrapper" style="position: fixed; top: 0; left: 0;
   width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8);
@@ -389,10 +382,7 @@ background-color: #4caf50;
   </div>
 </div>
 
-
-    <script>
-  
-  // ✅ Mobile and browser checks
+<script>
   function isMobile() {
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   }
@@ -402,6 +392,36 @@ background-color: #4caf50;
     return /Chrome/i.test(ua) || /Safari/i.test(ua);
   }
 
+  function isFromCorrectPageForCalculations() {
+    const ref = document.referrer;
+    return (
+      ref === "https://flexx254.github.io/d4d/" ||
+      ref === "https://flexx254.github.io/d4d/index.html" ||
+      ref === "https://flexx254.github.io/d4d/trialtrack.html"
+    );
+  }
+
+  function isFromCorrectPageForTrialTrack() {
+    const ref = document.referrer;
+    return (
+      ref === "https://flexx254.github.io/d4d/" ||
+      ref === "https://flexx254.github.io/d4d/index.html"
+    );
+  }
+
+  const path = window.location.pathname;
+
+  // ✅ Redirect trialtrack.html if not from index
+  if (path.includes("trialtrack.html") && !isFromCorrectPageForTrialTrack()) {
+    window.location.href = "https://flexx254.github.io/d4d/index.html";
+  }
+
+  // ✅ Redirect calculations.html if not from index or trialtrack
+  if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
+    window.location.href = "https://flexx254.github.io/d4d/index.html";
+  }
+
+  // ✅ Show overlay if browser/device conditions fail
   const messages = [];
 
   if (!isMobile()) {
@@ -410,8 +430,8 @@ background-color: #4caf50;
 
   if (!isAllowedBrowser()) {
     messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or 
-      <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>
-      Copy this link and open it there:<br><code>${location.href}</code>`);
+    <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>
+    Copy this link and open it there:<br><code>${location.href}</code>`);
   }
 
   if (messages.length > 0) {
@@ -425,6 +445,5 @@ background-color: #4caf50;
     document.getElementById("overlay-wrapper").style.display = "flex";
   }
 </script>
-
 </body>
   </html>
