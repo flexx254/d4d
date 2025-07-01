@@ -306,7 +306,6 @@ if (trips.length > 0) {
     <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
   </div>
 </div>
-
 <script>
   function isMobile() {
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -317,15 +316,27 @@ if (trips.length > 0) {
     return /Chrome/i.test(ua) || /Safari/i.test(ua);
   }
 
-  function isFromCorrectPage() {
+  function isFromCorrectPageForCalculations() {
     const ref = document.referrer;
-    return ref === "https://flexx254.github.io/d4d/" || ref === "https://flexx254.github.io/d4d/index.html";
+    return (
+      ref === "https://flexx254.github.io/d4d/" ||
+      ref === "https://flexx254.github.io/d4d/index.html" ||
+      ref === "https://flexx254.github.io/d4d/trialtrack.html"
+    );
   }
 
   const path = window.location.pathname;
 
-  // ✅ Redirect if user opens either page directly
-  if ((path.includes("trialtrack.html") || path.includes("calculations.html")) && !isFromCorrectPage()) {
+  // ✅ Redirect trialtrack.html if not from index
+  if (path.includes("trialtrack.html")) {
+    const ref = document.referrer;
+    if (ref !== "https://flexx254.github.io/d4d/" && ref !== "https://flexx254.github.io/d4d/index.html") {
+      window.location.href = "https://flexx254.github.io/d4d/index.html";
+    }
+  }
+
+  // ✅ Redirect calculations.html if not from index or trialtrack
+  if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
     window.location.href = "https://flexx254.github.io/d4d/index.html";
   }
 
