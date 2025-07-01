@@ -283,5 +283,65 @@ document.getElementById('installBtn').addEventListener('click', () => {
 });
                               
   </script>
+
+
+  <!-- Translucent black wrapper with white overlay box -->
+<div id="overlay-wrapper" style="position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8);
+  z-index: 9999; display: none; justify-content: center; align-items: center;">
+  
+  <div style="background-color: white; padding: 20px; max-width: 90%;
+    border-radius: 10px; text-align: left; font-family: sans-serif;">
+    <h2 style="color: red; font-size: 18px;">Notice</h2>
+    <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
+  </div>
+</div>
+
+<script>
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  function isAllowedBrowser() {
+    const ua = navigator.userAgent;
+    return /Chrome/i.test(ua) || /Safari/i.test(ua);
+  }
+
+  function isFromCorrectPage() {
+    const ref = document.referrer;
+    return ref === "https://flexx254.github.io/d4d/" || ref === "https://flexx254.github.io/d4d/index.html";
+  }
+
+  const path = window.location.pathname;
+
+  // ✅ Redirect if user opens either page directly
+  if ((path.includes("trialtrack.html") || path.includes("calculations.html")) && !isFromCorrectPage()) {
+    window.location.href = "https://flexx254.github.io/d4d/index.html";
+  }
+
+  // ✅ Show overlay if browser/device conditions fail
+  const messages = [];
+
+  if (!isMobile()) {
+    messages.push("This app is restricted to mobile phones only.");
+  }
+
+  if (!isAllowedBrowser()) {
+    messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or 
+    <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>
+    Copy this link and open it there:<br><code>${location.href}</code>`);
+  }
+
+  if (messages.length > 0) {
+    const ul = document.getElementById("warning-messages");
+    messages.forEach(msg => {
+      const li = document.createElement("li");
+      li.innerHTML = msg;
+      ul.appendChild(li);
+    });
+
+    document.getElementById("overlay-wrapper").style.display = "flex";
+  }
+</script>
 </body>
   </html>
