@@ -140,6 +140,16 @@ background-color: #4caf50;
     Timer: 00:00:00 | Distance: 0.00 km
   </div>
 
+  <script>
+  // ✅ Check if user came from index.html using sessionStorage
+  if (!sessionStorage.getItem("cameFromIndex")) {
+    window.location.href = "https://flexx254.github.io/d4d/index.html";
+  }
+
+  // 🧹 Clear the flag immediately to block page refresh reuse
+  sessionStorage.removeItem("cameFromIndex");
+  </script>
+
   <!-- Mapbox -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script>
@@ -381,14 +391,7 @@ background-color: #4caf50;
 
 
     <script>
-  // ✅ Check if the user came from index.html using sessionStorage
-  if (!sessionStorage.getItem("cameFromIndex")) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
-  }
-
-  // Optionally clear the flag after first entry to force redirect on refresh
-  sessionStorage.removeItem("cameFromIndex");
-
+  
   // ✅ Mobile and browser checks
   function isMobile() {
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
