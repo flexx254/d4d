@@ -92,16 +92,50 @@ border-top-left-radius: 30px;
   }
 }
 
-  .menu-btn, .trips-btn, .start-btn {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 50px;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
+.trips-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+.menu-btn {
+background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  width: 65px;
+}
+    
+  
+
+
+/* ✅ Orange Start Button (only top-left one) */
+.top-left .start-btn {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: bold;
+  width: 180px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  transition: background-color 0.3s ease;
+}
+
+.top-left .start-btn:hover {
+  background-color: darkorange;
+}
 
     .menu-list {
       background: white;
@@ -144,7 +178,7 @@ border-top-left-radius: 30px;
   <!-- Top Right Trips Button -->
   <div class="overlay top-right">
         <a href="trips.html">
-  <button class="start-btn"  >Trips</button>
+  <button class="trips-btn"  >Trips</button>
         </a>
   </div>
 
@@ -250,4 +284,4 @@ document.getElementById('installBtn').addEventListener('click', () => {
                               
   </script>
 </body>
-</html>
+  </html>
