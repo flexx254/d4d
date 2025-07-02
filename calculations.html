@@ -365,6 +365,14 @@ if (trips.length > 0) {
 
     document.getElementById("overlay-wrapper").style.display = "flex";
   }
+
+  window.addEventListener("popstate", function () {
+    window.location.href = "https://flexx254.github.io/d4d/";
+  });
+
+  // Push current state to history so popstate will fire on back
+  history.pushState({}, "");
+
 </script>
 </body>
 </html>
