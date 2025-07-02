@@ -167,9 +167,7 @@
       <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
     </div>
   </div><script>
-
 let selectedService = '';
-let fareCalculated = false;
 const finalTime = localStorage.getItem('finalTime') || '00:00:00';
 const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
 
@@ -215,7 +213,6 @@ function selectService(service) {
   }
 
   calcBtn.style.display = (service === 'extended') ? 'none' : 'block';
-
   if (service === 'extended') {
     document.getElementById('extendedFareOverlay').style.display = 'flex';
   }
@@ -260,7 +257,6 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
   }
 
   document.getElementById('fareOverlay').style.display = 'flex';
-  fareCalculated = true;
 });
 
 function calculateExtendedFare() {
@@ -295,44 +291,13 @@ function calculateExtendedFare() {
   document.getElementById("extendedFareOverlay").style.display = "none";
   document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
   document.getElementById("fareOverlay").style.display = "flex";
-  fareCalculated = true;
 }
 
 function closeOverlay() {
   document.getElementById('fareOverlay').style.display = 'none';
 }
 
-// Confirm leaving if fare not calculated
-function confirmBackNavigation() {
-  if (!fareCalculated) {
-    const leave = confirm("Fare has not been calculated.\nDo you want to go back and start over?");
-    if (leave) {
-      window.location.href = "index.html";
-    }
-  } else {
-    window.location.href = "index.html";
-  }
-}
-
-// Back button and browser back
-document.querySelector(".back-btn").addEventListener("click", function (e) {
-  e.preventDefault();
-  confirmBackNavigation();
-});
-
-window.addEventListener("popstate", function () {
-  confirmBackNavigation();
-});
-
-history.pushState({}, "");
-
-window.addEventListener("pageshow", function (event) {
-  if (event.persisted) {
-    window.location.href = "index.html";
-  }
-});
-
-// Device + Browser checks
+// Device/browser restriction overlay logic
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
@@ -348,16 +313,11 @@ function isFromCorrectPageForCalculations() {
     ref === "https://flexx254.github.io/d4d/trialtrack.html"
   );
 }
-
 const path = window.location.pathname;
-
 if (path.includes("trialtrack.html")) {
   const ref = document.referrer;
-  if (!ref.includes("/d4d/index.html")) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
-  }
+  if (!ref.includes("/d4d/index.html")) window.location.href = "https://flexx254.github.io/d4d/index.html";
 }
-
 if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
   window.location.href = "https://flexx254.github.io/d4d/index.html";
 }
@@ -365,10 +325,9 @@ if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
 const messages = [];
 if (!isMobile()) messages.push("This app is restricted to mobile phones only.");
 if (!isAllowedBrowser()) {
-  messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or 
+  messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or \
   <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>Copy this link and open it there:<br><code>${location.href}</code>`);
 }
-
 if (messages.length > 0) {
   const ul = document.getElementById("warning-messages");
   messages.forEach(msg => {
@@ -377,7 +336,47 @@ if (messages.length > 0) {
     ul.appendChild(li);
   });
   document.getElementById("overlay-wrapper").style.display = "flex";
+}
+window.addEventListener("popstate", function () {
+  window.location.href = "https://flexx254.github.io/d4d/";
+});
+history.pushState({}, "");
+window.addEventListener("pageshow", function (event) {
+  if (event.persisted) {
+    window.location.href = "https://flexx254.github.io/d4d/";
+  }
+});
 
+    let fareCalculated = false; // Track fare status
+
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  // existing code...
+  fareCalculated = true; // Set to true after successful calculation
+  // existing code continues...
+});
+
+function confirmBackNavigation() {
+  if (!fareCalculated) {
+    const leave = confirm("Fare has not been calculated.\nDo you want to go back and start over?");
+    if (leave) {
+      window.location.href = "index.html";
+    }
+    // Else stay on the page
+  } else {
+    window.location.href = "index.html";
+  }
+}
+
+// Intercept browser/device back key
+window.addEventListener("popstate", function () {
+  confirmBackNavigation();
+});
+
+// Intercept back button click
+document.querySelector(".back-btn").addEventListener("click", function (e) {
+  e.preventDefault();
+  confirmBackNavigation();
+});
 </script>
 </body>
-      </html>
+        </html>
