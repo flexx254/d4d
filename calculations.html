@@ -128,7 +128,7 @@
 </head>
 <body>
   <div class="container">
-    <button class="back-btn" onclick="location.href='index.html'">← Back</button>
+    <button class="back-btn" onclick="handleBackButtonClick()">← Back</button>
     <h2>Fare Calculator</h2>
     <div class="btn-group">
       <button onclick="selectService('bolt')">Bolt</button>
@@ -351,6 +351,27 @@ window.addEventListener("pageshow", function (event) {
     function closeOverlayAndExit() {
   document.getElementById('fareOverlay').style.display = 'none';
   window.location.href = "index.html";
-                                                                                                                      }
+    function redirectBasedOnFare(ask = true) {
+  const fare = localStorage.getItem("finalFare");
+  if (!fare) {
+    if (ask) {
+      const confirmGoBack = confirm("Fare not calculated yet. Go back to home?");
+      if (confirmGoBack) window.location.href = "index.html";
+    }
+  } else {
+    window.location.href = "index.html";
+  }
+}
+
+function handleBackButtonClick() {
+  redirectBasedOnFare(true);
+}
+
+function handleDeviceBack() {
+  redirectBasedOnFare(true);
+}
+
+// Replace previous back handling with this
+window.addEventListener("popstate", handleDeviceBack);                                                                                                                  }
 </script></body>
 </html>
