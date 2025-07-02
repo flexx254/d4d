@@ -383,16 +383,18 @@ function handleBackButtonClick() {
     }
   }
 
-  // Push a custom state and listen for back presses
-  function setupBackHandler() {
-    history.pushState({ page: "fareCalc" }, "", "");
-    window.addEventListener("popstate", function (event) {
-      if (event.state && event.state.page === "fareCalc") {
-        handleDeviceBack();
-      }
-    });
-  }
+// Improved back button handling for devices
+function setupBackHandler() {
+  history.pushState(null, "", location.href); // Dummy state
+  history.pushState({ page: "fareCalc" }, "", ""); // Active state
 
+  window.addEventListener("popstate", function (event) {
+    if (event.state && event.state.page === "fareCalc") {
+      handleDeviceBack();
+      history.pushState({ page: "fareCalc" }, "", ""); // Re-push state to trap again
+    }
+  });
+                   }
   // Run once on page load
   setupBackHandler();
                                                   
