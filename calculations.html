@@ -348,10 +348,13 @@ window.addEventListener("pageshow", function (event) {
   }
 });
 
-    function closeOverlayAndExit() {
+         function closeOverlayAndExit() {
   document.getElementById('fareOverlay').style.display = 'none';
   window.location.href = "index.html";
-    function redirectBasedOnFare(ask = true) {
+}
+
+// These go separately below it:
+function redirectBasedOnFare(ask = true) {
   const fare = localStorage.getItem("finalFare");
   if (!fare) {
     if (ask) {
@@ -371,7 +374,7 @@ function handleDeviceBack() {
   redirectBasedOnFare(true);
 }
 
-// Replace previous back handling with this
-window.addEventListener("popstate", handleDeviceBack);                                                                                                                  }
+// Attach handler
+window.addEventListener("popstate", handleDeviceBack);                                                                                                             }
 </script></body>
 </html>
