@@ -372,7 +372,31 @@ function handleDeviceBack() {
   redirectBasedOnFare(true);
 }
 
-// Attach handler
-window.addEventListener("popstate", handleDeviceBack);                                                          
+   
+  // Handles redirect when the back button is pressed
+  function handleDeviceBack() {
+    const fare = localStorage.getItem("finalFare");
+    if (!fare) {
+      if (confirm("Fare not calculated yet. Go back to home?")) {
+        window.location.href = "index.html";
+      }
+    } else {
+      window.location.href = "index.html";
+    }
+  }
+
+  // Push a custom state and listen for back presses
+  function setupBackHandler() {
+    history.pushState({ page: "fareCalc" }, "", "");
+    window.addEventListener("popstate", function (event) {
+      if (event.state && event.state.page === "fareCalc") {
+        handleDeviceBack();
+      }
+    });
+  }
+
+  // Run once on page load
+  setupBackHandler();
+                                                  
 </script></body>
 </html>
