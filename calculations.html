@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fare Calculator</title>
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       padding: 0;
@@ -14,13 +12,11 @@
       background: #f4f4f4;
       color: #333;
     }
-
     .container {
       max-width: 500px;
       margin: auto;
       padding: 16px;
     }
-
     .back-btn {
       display: inline-block;
       background: green;
@@ -32,13 +28,11 @@
       cursor: pointer;
       margin-bottom: 16px;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 12px;
       color: #222;
     }
-
     .btn-group {
       display: flex;
       flex-wrap: wrap;
@@ -46,7 +40,6 @@
       gap: 10px;
       margin-bottom: 16px;
     }
-
     .btn-group button {
       flex: 1 0 45%;
       padding: 10px;
@@ -58,12 +51,10 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-
     .btn-group button:hover {
       background: green;
       color: white;
     }
-
     select {
       width: 100%;
       padding: 10px;
@@ -72,7 +63,6 @@
       border: 1.5px solid #ccc;
       border-radius: 8px;
     }
-
     #calculateBtn {
       display: block;
       width: 100%;
@@ -85,11 +75,7 @@
       cursor: pointer;
       margin-top: 10px;
     }
-
-    #calculateBtn:hover {
-      background: green;
-    }
-
+    #calculateBtn:hover { background: green; }
     .overlay {
       position: fixed;
       top: 0; left: 0;
@@ -100,7 +86,6 @@
       align-items: center;
       z-index: 999;
     }
-
     .overlay-content {
       background: white;
       padding: 24px;
@@ -112,7 +97,6 @@
       position: relative;
       animation: popIn 0.3s ease;
     }
-
     .close-overlay {
       position: absolute;
       top: 10px;
@@ -121,26 +105,20 @@
       color: #666;
       cursor: pointer;
     }
-
     .overlay-content h3 {
       font-size: 24px;
       margin-bottom: 10px;
       color: green;
     }
-
     #fareDisplay {
       font-size: 28px;
       font-weight: bold;
       color: #222;
-      text-align: center;
-      margin-top: 20px;
     }
-
     @keyframes popIn {
       from { transform: scale(0.8); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-
     @media (max-width: 360px) {
       .btn-group button {
         flex: 1 0 100%;
@@ -152,26 +130,24 @@
   <div class="container">
     <button class="back-btn" onclick="location.href='index.html'">← Back</button>
     <h2>Fare Calculator</h2>
-
     <div class="btn-group">
       <button onclick="selectService('bolt')">Bolt</button>
       <button onclick="selectService('uber')">Uber</button>
       <button onclick="selectService('faras')">Faras</button>
       <button onclick="selectService('extended')">Extended</button>
     </div>
-
     <div id="categoryDropdown" style="display:none;">
       <label for="categorySelect">Select Category:</label>
       <select id="categorySelect"></select>
     </div>
-
     <button id="calculateBtn">Calculate Fare</button>
-
-    <div id="fareDisplay"></div>
-  </div>
-
-  <!-- Extended fare input -->
-  <div class="overlay" id="extendedFareOverlay">
+  </div>  <div class="overlay" id="fareOverlay">
+    <div class="overlay-content">
+      <span class="close-overlay" onclick="closeOverlay()">×</span>
+      <h3>Your Final Fare</h3>
+      <div id="fareDisplay">KES 0.00</div>
+    </div>
+  </div>  <div class="overlay" id="extendedFareOverlay">
     <div class="overlay-content">
       <span class="close-overlay" onclick="document.getElementById('extendedFareOverlay').style.display='none'">×</span>
       <h3>Enter Your Fare Details</h3>
@@ -182,111 +158,193 @@
       <input type="number" id="extMinKm" placeholder="Minimum Km (e.g. 3)" /><br><br>
       <button onclick="calculateExtendedFare()">Calculate & Save</button>
     </div>
-  </div>
+  </div>  <!-- Device/browser overlay -->  <div id="overlay-wrapper" style="position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8);
+    z-index: 9999; display: none; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 20px; max-width: 90%;
+      border-radius: 10px; text-align: left; font-family: sans-serif;">
+      <h2 style="color: red; font-size: 18px;">Notice</h2>
+      <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
+    </div>
+  </div><script>
+let selectedService = '';
+const finalTime = localStorage.getItem('finalTime') || '00:00:00';
+const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
 
-  <script>
-    // Dummy values if not set
-    if (!localStorage.getItem('finalTime')) {
-      localStorage.setItem('finalTime', '00:12:00');
+const serviceCategories = {
+  bolt: ['Economy', 'Comfort', 'Executive'],
+  uber: ['UberX', 'UberSelect', 'UberBlack'],
+  faras: ['Standard', 'Premium', 'Business'],
+  extended: []
+};
+
+const rateChart = {
+  bolt: {
+    Economy: { baseFare: 50, perKm: 100, perMin: 50, minFare: 70, minKm: 1 },
+    Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200, minKm: 3 },
+    Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300, minKm: 3 }
+  },
+  uber: {
+    UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160, minKm: 3 },
+    UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220, minKm: 3 },
+    UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350, minKm: 3 }
+  },
+  faras: {
+    Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140, minKm: 3 },
+    Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190, minKm: 3 },
+    Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310, minKm: 3 }
+  },
+  extended: { baseFare: 60, perKm: 35, perMin: 3, minFare: 170, minKm: 3 }
+};
+
+function selectService(service) {
+  selectedService = service;
+  const dropdown = document.getElementById('categoryDropdown');
+  const categorySelect = document.getElementById('categorySelect');
+  const calcBtn = document.getElementById('calculateBtn');
+
+  if (serviceCategories[service].length === 0) {
+    dropdown.style.display = 'none';
+    categorySelect.innerHTML = '';
+  } else {
+    dropdown.style.display = 'block';
+    categorySelect.innerHTML = serviceCategories[service]
+      .map(cat => `<option value="${cat}">${cat}</option>`).join('');
+  }
+
+  calcBtn.style.display = (service === 'extended') ? 'none' : 'block';
+  if (service === 'extended') {
+    document.getElementById('extendedFareOverlay').style.display = 'flex';
+  }
+}
+
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  if (!selectedService) return alert('Please select a service.');
+
+  let fare = 0;
+  const [hh, mm, ss] = finalTime.split(':').map(Number);
+  const totalMinutes = hh * 60 + mm + ss / 60;
+
+  if (selectedService === 'extended') {
+    const r = rateChart.extended;
+    fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
+    if (finalDistance < r.minKm || fare < r.minFare) fare = r.minFare;
+  } else {
+    const category = document.getElementById('categorySelect').value;
+    const r = rateChart[selectedService][category];
+    if (!r) return alert('Invalid category selected.');
+    fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
+    if (finalDistance < r.minKm || fare < r.minFare) fare = r.minFare;
+  }
+
+  const finalFare = fare.toFixed(2);
+  const label = `${selectedService.charAt(0).toUpperCase() + selectedService.slice(1)}${selectedService !== 'extended' ? ' - ' + document.getElementById('categorySelect').value : ''} KES ${finalFare}`;
+
+  document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
+  localStorage.setItem('finalFare', finalFare);
+  localStorage.setItem('finalFareLabel', label);
+
+  const trips = JSON.parse(localStorage.getItem('trips')) || [];
+  if (trips.length > 0) {
+    const lastTrip = trips[trips.length - 1];
+    lastTrip.fare = finalFare;
+    lastTrip.app = selectedService;
+    if (selectedService !== 'extended') {
+      lastTrip.category = document.getElementById('categorySelect').value;
     }
-    if (!localStorage.getItem('finalDistance')) {
-      localStorage.setItem('finalDistance', '3.5');
-    }
+    trips[trips.length - 1] = lastTrip;
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }
 
-    let selectedService = '';
-    const serviceCategories = {
-      bolt: ['Economy', 'Comfort', 'Executive'],
-      uber: ['UberX', 'UberSelect', 'UberBlack'],
-      faras: ['Standard', 'Premium', 'Business'],
-      extended: [] // No dropdown for extended
-    };
+  document.getElementById('fareOverlay').style.display = 'flex';
+});
 
-    const rateChart = {
-      bolt: {
-        Economy: { baseFare: 50, perKm: 100, perMin: 50, minFare: 70, minKm: 1 },
-        Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200, minKm: 3 },
-        Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300, minKm: 3 }
-      },
-      uber: {
-        UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160, minKm: 3 },
-        UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220, minKm: 3 },
-        UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350, minKm: 3 }
-      },
-      faras: {
-        Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140, minKm: 3 },
-        Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190, minKm: 3 },
-        Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310, minKm: 3 }
-      },
-      extended: {
-        baseFare: 60, perKm: 35, perMin: 3, minFare: 170, minKm: 3
-      }
-    };
+function calculateExtendedFare() {
+  const baseFare = parseFloat(document.getElementById("extBase").value);
+  const perKm = parseFloat(document.getElementById("extPerKm").value);
+  const perMin = parseFloat(document.getElementById("extPerMin").value);
+  const minFare = parseFloat(document.getElementById("extMinFare").value);
+  const minKm = parseFloat(document.getElementById("extMinKm").value);
+  const [hh, mm, ss] = finalTime.split(":").map(Number);
+  const totalMinutes = hh * 60 + mm + ss / 60;
+  const totalKm = finalDistance;
 
-    function selectService(service) {
-      selectedService = service;
-      const dropdown = document.getElementById('categoryDropdown');
-      const categorySelect = document.getElementById('categorySelect');
-      const calcBtn = document.getElementById('calculateBtn');
+  if ([baseFare, perKm, perMin, minFare, minKm].some(isNaN)) return alert("Please fill all fields.");
 
-      if (serviceCategories[service].length === 0) {
-        dropdown.style.display = 'none';
-        categorySelect.innerHTML = '';
-        calcBtn.style.display = 'none';
-        document.getElementById('extendedFareOverlay').style.display = 'flex';
-      } else {
-        dropdown.style.display = 'block';
-        categorySelect.innerHTML = serviceCategories[service].map(cat => `<option value="${cat}">${cat}</option>`).join('');
-        calcBtn.style.display = 'block';
-      }
-    }
+  let fare = baseFare + totalKm * perKm + totalMinutes * perMin;
+  if (totalKm < minKm || fare < minFare) fare = minFare;
+  const finalFare = fare.toFixed(2);
+  const label = `Extended KES ${finalFare}`;
 
-    document.getElementById('calculateBtn').addEventListener('click', () => {
-      if (!selectedService) {
-        alert('Please select a service.');
-        return;
-      }
+  localStorage.setItem('finalFare', finalFare);
+  localStorage.setItem('finalFareLabel', label);
 
-      const finalTime = localStorage.getItem('finalTime') || '00:00:00';
-      const [hh, mm, ss] = finalTime.split(':').map(Number);
-      const totalMinutes = hh * 60 + mm + ss / 60;
-      const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
+  const trips = JSON.parse(localStorage.getItem('trips')) || [];
+  if (trips.length > 0) {
+    const lastTrip = trips[trips.length - 1];
+    lastTrip.fare = finalFare;
+    lastTrip.app = 'extended';
+    trips[trips.length - 1] = lastTrip;
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }
 
-      let fare = 0;
-      if (selectedService !== 'extended') {
-        const category = document.getElementById('categorySelect').value;
-        const r = rateChart[selectedService][category];
-        fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
-        if (finalDistance < r.minKm || fare < r.minFare) fare = r.minFare;
-      }
+  document.getElementById("extendedFareOverlay").style.display = "none";
+  document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
+  document.getElementById("fareOverlay").style.display = "flex";
+}
 
-      const finalFare = fare.toFixed(2);
-      document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
-    });
+function closeOverlay() {
+  document.getElementById('fareOverlay').style.display = 'none';
+}
 
-    function calculateExtendedFare() {
-      const baseFare = parseFloat(document.getElementById("extBase").value);
-      const perKm = parseFloat(document.getElementById("extPerKm").value);
-      const perMin = parseFloat(document.getElementById("extPerMin").value);
-      const minFare = parseFloat(document.getElementById("extMinFare").value);
-      const minKm = parseFloat(document.getElementById("extMinKm").value);
+// Device/browser restriction overlay logic
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+function isAllowedBrowser() {
+  const ua = navigator.userAgent;
+  return /Chrome/i.test(ua) || /Safari/i.test(ua);
+}
+function isFromCorrectPageForCalculations() {
+  const ref = document.referrer;
+  return (
+    ref === "https://flexx254.github.io/d4d/" ||
+    ref === "https://flexx254.github.io/d4d/index.html" ||
+    ref === "https://flexx254.github.io/d4d/trialtrack.html"
+  );
+}
+const path = window.location.pathname;
+if (path.includes("trialtrack.html")) {
+  const ref = document.referrer;
+  if (!ref.includes("/d4d/index.html")) window.location.href = "https://flexx254.github.io/d4d/index.html";
+}
+if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
+  window.location.href = "https://flexx254.github.io/d4d/index.html";
+}
 
-      const finalTime = localStorage.getItem('finalTime') || '00:00:00';
-      const [hh, mm, ss] = finalTime.split(':').map(Number);
-      const totalMinutes = hh * 60 + mm + ss / 60;
-      const totalKm = parseFloat(localStorage.getItem('finalDistance')) || 0;
-
-      if ([baseFare, perKm, perMin, minFare, minKm].some(isNaN)) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      let fare = baseFare + totalKm * perKm + totalMinutes * perMin;
-      if (totalKm < minKm || fare < minFare) fare = minFare;
-
-      const finalFare = fare.toFixed(2);
-      document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
-      document.getElementById("extendedFareOverlay").style.display = "none";
-    }
-  </script>
-</body>
-        </html>
+const messages = [];
+if (!isMobile()) messages.push("This app is restricted to mobile phones only.");
+if (!isAllowedBrowser()) {
+  messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or \
+  <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>Copy this link and open it there:<br><code>${location.href}</code>`);
+}
+if (messages.length > 0) {
+  const ul = document.getElementById("warning-messages");
+  messages.forEach(msg => {
+    const li = document.createElement("li");
+    li.innerHTML = msg;
+    ul.appendChild(li);
+  });
+  document.getElementById("overlay-wrapper").style.display = "flex";
+}
+window.addEventListener("popstate", function () {
+  window.location.href = "https://flexx254.github.io/d4d/";
+});
+history.pushState({}, "");
+window.addEventListener("pageshow", function (event) {
+  if (event.persisted) {
+    window.location.href = "https://flexx254.github.io/d4d/";
+  }
+});
+</script></body>
+      </html>
