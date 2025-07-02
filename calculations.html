@@ -346,37 +346,5 @@ window.addEventListener("pageshow", function (event) {
     window.location.href = "https://flexx254.github.io/d4d/";
   }
 });
-
-    let fareCalculated = false; // Track fare status
-
-document.getElementById('calculateBtn').addEventListener('click', () => {
-  // existing code...
-  fareCalculated = true; // Set to true after successful calculation
-  // existing code continues...
-});
-
-function confirmBackNavigation() {
-  if (!fareCalculated) {
-    const leave = confirm("Fare has not been calculated.\nDo you want to go back and start over?");
-    if (leave) {
-      window.location.href = "index.html";
-    }
-    // Else stay on the page
-  } else {
-    window.location.href = "index.html";
-  }
-}
-
-// Intercept browser/device back key
-window.addEventListener("popstate", function () {
-  confirmBackNavigation();
-});
-
-// Intercept back button click
-document.querySelector(".back-btn").addEventListener("click", function (e) {
-  e.preventDefault();
-  confirmBackNavigation();
-});
-</script>
-</body>
-        </html>
+</script></body>
+</html>
