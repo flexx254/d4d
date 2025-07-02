@@ -143,7 +143,8 @@
     <button id="calculateBtn">Calculate Fare</button>
   </div>  <div class="overlay" id="fareOverlay">
     <div class="overlay-content">
-      <span class="close-overlay" onclick="closeOverlay()">×</span>
+      <span class="close-overlay" onclick="closeOverlayAndExit()">×</span>
+      
       <h3>Your Final Fare</h3>
       <div id="fareDisplay">KES 0.00</div>
     </div>
@@ -346,5 +347,10 @@ window.addEventListener("pageshow", function (event) {
     window.location.href = "https://flexx254.github.io/d4d/";
   }
 });
+
+    function closeOverlayAndExit() {
+  document.getElementById('fareOverlay').style.display = 'none';
+  window.location.href = "index.html";
+                                                                                                                      }
 </script></body>
 </html>
