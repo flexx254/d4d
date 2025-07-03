@@ -337,14 +337,40 @@ if (messages.length > 0) {
   });
   document.getElementById("overlay-wrapper").style.display = "flex";
 }
-window.addEventListener("popstate", function () {
-  window.location.href = "https://flexx254.github.io/d4d/";
-});
-history.pushState({}, "");
-window.addEventListener("pageshow", function (event) {
-  if (event.persisted) {
-    window.location.href = "https://flexx254.github.io/d4d/";
+  let fareCalculated = false;
+
+  // Trap the back button
+  history.pushState({ page: "fareCalc" }, "", "");
+  window.addEventListener("popstate", function (event) {
+    if (!fareCalculated) {
+      alert("Please calculate the fare before exiting.");
+      history.pushState({ page: "fareCalc" }, "", ""); // Block back again
+    } else {
+      window.location.href = "https://flexx254.github.io/d4d/";
+    }
+  });
+
+  // Set flag when fare is calculated
+  function markFareAsCalculated() {
+    fareCalculated = true;
   }
-});
+
+  // Call it inside both fare calculation functions
+  document.getElementById("calculateBtn").addEventListener("click", () => {
+    // ... your existing fare calculation logic ...
+    markFareAsCalculated(); // ✅ Add this line
+  });
+
+  function calculateExtendedFare() {
+    // ... your existing extended fare calculation logic ...
+    markFareAsCalculated(); // ✅ Add this line
+  }
+
+  // Optional: Handle Android/iOS back-forward cache (pageshow)
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted && !fareCalculated) {
+      window.location.href = "https://flexx254.github.io/d4d/";
+    }
+  });
 </script></body>
 </html>
