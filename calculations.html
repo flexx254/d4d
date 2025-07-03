@@ -149,7 +149,7 @@
     </div>
   </div>  <div class="overlay" id="extendedFareOverlay">
     <div class="overlay-content">
-      <span class="close-overlay" onclck="document.getElementById('extendedFareOverlay').style.display='none'">×</span>
+      <span class="close-overlay" onclick="document.getElementById('extendedFareOverlay').style.display='none'">×</span>
       <h3>Enter Your Fare Details</h3>
       <input type="number" id="extBase" placeholder="Base Fare (e.g. 60)" /><br><br>
       <input type="number" id="extPerKm" placeholder="Fare per Km (e.g. 35)" /><br><br>
@@ -167,107 +167,202 @@
       <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
     </div>
   </div><script>
-        
+let selectedService = '';
+const finalTime = localStorage.getItem('finalTime') || '00:00:00';
+const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
 
-  const finalTime = localStorage.getItem('finalTime') || '00:00:00';
-  const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
-  const path = window.location.pathname;
+const serviceCategories = {
+  bolt: ['Economy', 'Comfort', 'Executive'],
+  uber: ['UberX', 'UberSelect', 'UberBlack'],
+  faras: ['Standard', 'Premium', 'Business'],
+  extended: []
+};
 
-  // Check if user is allowed to enter this page
-  if (path.includes("calculations.html") && localStorage.getItem("cameFromTrialTrack") !== "yes") {
-    alert("Please track the trip first before calculating fare.");
-    window.location.href = "index.html";
+const rateChart = {
+  bolt: {
+    Economy: { baseFare: 50, perKm: 100, perMin: 50, minFare: 70, minKm: 1 },
+    Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200, minKm: 3 },
+    Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300, minKm: 3 }
+  },
+  uber: {
+    UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160, minKm: 3 },
+    UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220, minKm: 3 },
+    UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350, minKm: 3 }
+  },
+  faras: {
+    Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140, minKm: 3 },
+    Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190, minKm: 3 },
+    Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310, minKm: 3 }
+  },
+  extended: { baseFare: 60, perKm: 35, perMin: 3, minFare: 170, minKm: 3 }
+};
+
+function selectService(service) {
+  selectedService = service;
+  const dropdown = document.getElementById('categoryDropdown');
+  const categorySelect = document.getElementById('categorySelect');
+  const calcBtn = document.getElementById('calculateBtn');
+
+  if (serviceCategories[service].length === 0) {
+    dropdown.style.display = 'none';
+    categorySelect.innerHTML = '';
+  } else {
+    dropdown.style.display = 'block';
+    categorySelect.innerHTML = serviceCategories[service]
+      .map(cat => `<option value="${cat}">${cat}</option>`).join('');
   }
 
-  // Service options
-  const serviceCategories = {
-    bolt: ['Economy', 'Comfort', 'Executive'],
-    uber: ['UberX', 'UberSelect', 'UberBlack'],
-    faras: ['Standard', 'Premium', 'Business'],
-    extended: []
-  };
-
-  const rateChart = {
-    bolt: {
-      Economy: { baseFare: 50, perKm: 100, perMin: 50, minFare: 70, minKm: 1 },
-      Comfort: { baseFare: 70, perKm: 40, perMin: 3, minFare: 200, minKm: 3 },
-      Executive: { baseFare: 100, perKm: 50, perMin: 4, minFare: 300, minKm: 3 }
-    },
-    uber: {
-      UberX: { baseFare: 60, perKm: 32, perMin: 2.2, minFare: 160, minKm: 3 },
-      UberSelect: { baseFare: 75, perKm: 42, perMin: 3.5, minFare: 220, minKm: 3 },
-      UberBlack: { baseFare: 120, perKm: 55, perMin: 5, minFare: 350, minKm: 3 }
-    },
-    faras: {
-      Standard: { baseFare: 55, perKm: 28, perMin: 1.8, minFare: 140, minKm: 3 },
-      Premium: { baseFare: 70, perKm: 38, perMin: 3, minFare: 190, minKm: 3 },
-      Business: { baseFare: 110, perKm: 48, perMin: 4.5, minFare: 310, minKm: 3 }
-    },
-    extended: { baseFare: 60, perKm: 35, perMin: 3, minFare: 170, minKm: 3 }
-  };
-
-  let selectedService = '';
-
-  function selectService(service) {
-    selectedService = service;
-    const dropdown = document.getElementById('categoryDropdown');
-    const categorySelect = document.getElementById('categorySelect');
-    const calcBtn = document.getElementById('calculateBtn');
-
-    if (serviceCategories[service].length === 0) {
-      dropdown.style.display = 'none';
-      categorySelect.innerHTML = '';
-    } else {
-      dropdown.style.display = 'block';
-      categorySelect.innerHTML = serviceCategories[service]
-        .map(cat => `<option value="${cat}">${cat}</option>`).join('');
-    }
-
-    calcBtn.style.display = (service === 'extended') ? 'none' : 'block';
-    if (service === 'extended') {
-      document.getElementById('extendedFareOverlay').style.display = 'flex';
-    }
+  calcBtn.style.display = (service === 'extended') ? 'none' : 'block';
+  if (service === 'extended') {
+    document.getElementById('extendedFareOverlay').style.display = 'flex';
   }
+}
 
-  function markFareAsCalculated() {
-    localStorage.setItem("fareCalculated", "yes");
-  }
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  if (!selectedService) return alert('Please select a service.');
 
-  document.getElementById("calculateBtn").addEventListener("click", () => {
-    if (!selectedService) return alert("Please select a service.");
-    const category = document.getElementById("categorySelect").value;
-    const [hh, mm, ss] = finalTime.split(":").map(Number);
-    const totalMinutes = hh * 60 + mm + ss / 60;
-    let fare = 0;
+  let fare = 0;
+  const [hh, mm, ss] = finalTime.split(':').map(Number);
+  const totalMinutes = hh * 60 + mm + ss / 60;
 
-    const r = rateChart[selectedService][category];
-    if (!r) return alert("Invalid category selected.");
-
+  if (selectedService === 'extended') {
+    const r = rateChart.extended;
     fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
     if (finalDistance < r.minKm || fare < r.minFare) fare = r.minFare;
+  } else {
+    const category = document.getElementById('categorySelect').value;
+    const r = rateChart[selectedService][category];
+    if (!r) return alert('Invalid category selected.');
+    fare = r.baseFare + finalDistance * r.perKm + totalMinutes * r.perMin;
+    if (finalDistance < r.minKm || fare < r.minFare) fare = r.minFare;
+  }
 
-    const finalFare = fare.toFixed(2);
-    const label = `${selectedService} - ${category} KES ${finalFare}`;
+  const finalFare = fare.toFixed(2);
+  const label = `${selectedService.charAt(0).toUpperCase() + selectedService.slice(1)}${selectedService !== 'extended' ? ' - ' + document.getElementById('categorySelect').value : ''} KES ${finalFare}`;
 
-    document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
-    localStorage.setItem("finalFare", finalFare);
-    localStorage.setItem("finalFareLabel", label);
-    localStorage.setItem("fareCalculated", "yes");
+  document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
+  localStorage.setItem('finalFare', finalFare);
+  localStorage.setItem('finalFareLabel', label);
 
-    const trips = JSON.parse(localStorage.getItem("trips")) || [];
-    if (trips.length > 0) {
-      const lastTrip = trips[trips.length - 1];
-      lastTrip.fare = finalFare;
-      lastTrip.app = selectedService;
-      lastTrip.category = category;
-      trips[trips.length - 1] = lastTrip;
-      localStorage.setItem("trips", JSON.stringify(trips));
+  const trips = JSON.parse(localStorage.getItem('trips')) || [];
+  if (trips.length > 0) {
+    const lastTrip = trips[trips.length - 1];
+    lastTrip.fare = finalFare;
+    lastTrip.app = selectedService;
+    if (selectedService !== 'extended') {
+      lastTrip.category = document.getElementById('categorySelect').value;
     }
+    trips[trips.length - 1] = lastTrip;
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }
 
-    document.getElementById("fareOverlay").style.display = "flex";
+  document.getElementById('fareOverlay').style.display = 'flex';
+});
+
+function calculateExtendedFare() {
+  const baseFare = parseFloat(document.getElementById("extBase").value);
+  const perKm = parseFloat(document.getElementById("extPerKm").value);
+  const perMin = parseFloat(document.getElementById("extPerMin").value);
+  const minFare = parseFloat(document.getElementById("extMinFare").value);
+  const minKm = parseFloat(document.getElementById("extMinKm").value);
+  const [hh, mm, ss] = finalTime.split(":").map(Number);
+  const totalMinutes = hh * 60 + mm + ss / 60;
+  const totalKm = finalDistance;
+
+  if ([baseFare, perKm, perMin, minFare, minKm].some(isNaN)) return alert("Please fill all fields.");
+
+  let fare = baseFare + totalKm * perKm + totalMinutes * perMin;
+  if (totalKm < minKm || fare < minFare) fare = minFare;
+  const finalFare = fare.toFixed(2);
+  const label = `Extended KES ${finalFare}`;
+
+  localStorage.setItem('finalFare', finalFare);
+  localStorage.setItem('finalFareLabel', label);
+
+  const trips = JSON.parse(localStorage.getItem('trips')) || [];
+  if (trips.length > 0) {
+    const lastTrip = trips[trips.length - 1];
+    lastTrip.fare = finalFare;
+    lastTrip.app = 'extended';
+    trips[trips.length - 1] = lastTrip;
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }
+
+  document.getElementById("extendedFareOverlay").style.display = "none";
+  document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
+  document.getElementById("fareOverlay").style.display = "flex";
+}
+
+function closeOverlay() {
+  document.getElementById('fareOverlay').style.display = 'none';
+}
+
+// Device/browser restriction overlay logic
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+function isAllowedBrowser() {
+  const ua = navigator.userAgent;
+  return /Chrome/i.test(ua) || /Safari/i.test(ua);
+}
+function isFromCorrectPageForCalculations() {
+  const ref = document.referrer;
+  return (
+    ref === "https://flexx254.github.io/d4d/" ||
+    ref === "https://flexx254.github.io/d4d/index.html" ||
+    ref === "https://flexx254.github.io/d4d/trialtrack.html"
+  );
+}
+const path = window.location.pathname;
+if (path.includes("trialtrack.html")) {
+  const ref = document.referrer;
+  if (!ref.includes("/d4d/index.html")) window.location.href = "https://flexx254.github.io/d4d/index.html";
+}
+if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
+  window.location.href = "https://flexx254.github.io/d4d/index.html";
+}
+
+const messages = [];
+if (!isMobile()) messages.push("This app is restricted to mobile phones only.");
+if (!isAllowedBrowser()) {
+  messages.push(`Please use <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> or \
+  <a href="https://www.apple.com/safari/" target="_blank">Safari</a>.<br>Copy this link and open it there:<br><code>${location.href}</code>`);
+}
+if (messages.length > 0) {
+  const ul = document.getElementById("warning-messages");
+  messages.forEach(msg => {
+    const li = document.createElement("li");
+    li.innerHTML = msg;
+    ul.appendChild(li);
+  });
+  document.getElementById("overlay-wrapper").style.display = "flex";
+}
+  
+  let fareCalculated = false;
+
+  // Back button trap
+  history.pushState({ page: "fareCalc" }, "", "");
+  window.addEventListener("popstate", function (event) {
+    if (!fareCalculated) {
+      alert("Please calculate the fare before exiting.");
+      history.pushState({ page: "fareCalc" }, "", "");
+    } else {
+      window.location.href = "https://flexx254.github.io/d4d/";
+    }
+  });
+
+  // Mark fare as calculated
+  function markFareAsCalculated() {
+    fareCalculated = true;
+  }
+
+  // Update the standard fare button to include markFareAsCalculated
+  const originalFareCalc = document.getElementById("calculateBtn").onclick;
+  document.getElementById("calculateBtn").addEventListener("click", () => {
     markFareAsCalculated();
   });
 
+  // Updated extended fare calculator with markFareAsCalculated()
   function calculateExtendedFare() {
     const baseFare = parseFloat(document.getElementById("extBase").value);
     const perKm = parseFloat(document.getElementById("extPerKm").value);
@@ -282,55 +377,34 @@
 
     let fare = baseFare + totalKm * perKm + totalMinutes * perMin;
     if (totalKm < minKm || fare < minFare) fare = minFare;
-
     const finalFare = fare.toFixed(2);
     const label = `Extended KES ${finalFare}`;
 
-    localStorage.setItem("finalFare", finalFare);
-    localStorage.setItem("finalFareLabel", label);
-    localStorage.setItem("fareCalculated", "yes");
+    localStorage.setItem('finalFare', finalFare);
+    localStorage.setItem('finalFareLabel', label);
 
-    const trips = JSON.parse(localStorage.getItem("trips")) || [];
+    const trips = JSON.parse(localStorage.getItem('trips')) || [];
     if (trips.length > 0) {
       const lastTrip = trips[trips.length - 1];
       lastTrip.fare = finalFare;
-      lastTrip.app = "extended";
+      lastTrip.app = 'extended';
       trips[trips.length - 1] = lastTrip;
-      localStorage.setItem("trips", JSON.stringify(trips));
+      localStorage.setItem('trips', JSON.stringify(trips));
     }
 
     document.getElementById("extendedFareOverlay").style.display = "none";
     document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
     document.getElementById("fareOverlay").style.display = "flex";
 
-    markFareAsCalculated();
+    markFareAsCalculated(); // ✅ Set the flag after successful calc
   }
 
-  function closeOverlay() {
-    document.getElementById('fareOverlay').style.display = 'none';
-  }
-
-  // --- Restrict back navigation if fare not calculated ---
-  history.pushState(null, "", location.href);
-  window.addEventListener("popstate", function () {
-    if (localStorage.getItem("fareCalculated") !== "yes") {
-      alert("Please calculate the fare before leaving.");
-      history.pushState(null, "", location.href);
-    } else {
-      // Optional: clean up state and go home
-      localStorage.removeItem("fareCalculated");
-      localStorage.removeItem("cameFromTrialTrack");
-      window.location.href = "index.html";
+  // Handle back-forward cache edge case
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted && !fareCalculated) {
+      window.location.href = "https://flexx254.github.io/d4d/";
     }
   });
 
-  // Fallback for swipe/tab back
-  window.addEventListener("pageshow", function () {
-    if (localStorage.getItem("fareCalculated") !== "yes") {
-      window.location.href = "index.html";
-    }
-  });
-
-    
 </script></body>
 </html>
