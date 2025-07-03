@@ -166,7 +166,9 @@
       <h2 style="color: red; font-size: 18px;">Notice</h2>
       <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
     </div>
-  </div><script>
+  </div>
+  
+  <script>
 let selectedService = '';
 const finalTime = localStorage.getItem('finalTime') || '00:00:00';
 const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
@@ -305,23 +307,6 @@ function isAllowedBrowser() {
   const ua = navigator.userAgent;
   return /Chrome/i.test(ua) || /Safari/i.test(ua);
 }
-function isFromCorrectPageForCalculations() {
-  const ref = document.referrer;
-  return (
-    ref === "https://flexx254.github.io/d4d/" ||
-    ref === "https://flexx254.github.io/d4d/index.html" ||
-    ref === "https://flexx254.github.io/d4d/trialtrack.html"
-  );
-}
-const path = window.location.pathname;
-if (path.includes("trialtrack.html")) {
-  const ref = document.referrer;
-  if (!ref.includes("/d4d/index.html")) window.location.href = "https://flexx254.github.io/d4d/index.html";
-}
-if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
-  window.location.href = "https://flexx254.github.io/d4d/index.html";
-}
-
 const messages = [];
 if (!isMobile()) messages.push("This app is restricted to mobile phones only.");
 if (!isAllowedBrowser()) {
@@ -337,14 +322,44 @@ if (messages.length > 0) {
   });
   document.getElementById("overlay-wrapper").style.display = "flex";
 }
+
+// Prevent navigation to trialtrack.html unless fare is calculated
+document.addEventListener('click', function (e) {
+  const target = e.target.closest('a, button');
+
+  if (target && target.href && target.href.includes('trialtrack.html')) {
+    const fareCalculated = !!localStorage.getItem('finalFare');
+
+    if (!fareCalculated) {
+      e.preventDefault();
+      alert("Please calculate fare first.");
+    }
+  }
+});
+
+// Also block if using JavaScript redirects
+window.goToTrialTrack = function () {
+  const fareCalculated = !!localStorage.getItem('finalFare');
+  if (!fareCalculated) {
+    alert("Please calculate fare first.");
+    return;
+  }
+  window.location.href = "trialtrack.html";
+};
+
+// Prevent browser back navigation
 window.addEventListener("popstate", function () {
   window.location.href = "https://flexx254.github.io/d4d/";
 });
 history.pushState({}, "");
+
+// Prevent loading from cache
 window.addEventListener("pageshow", function (event) {
   if (event.persisted) {
     window.location.href = "https://flexx254.github.io/d4d/";
   }
 });
-</script></body>
+</script>
+
+</body>
         </html>
