@@ -383,20 +383,24 @@ function handleBackButtonClick() {
     }
   }
 
-// Improved back button handling for devices
-function setupBackHandler() {
-  history.pushState(null, "", location.href); // Dummy state
-  history.pushState({ page: "fareCalc" }, "", ""); // Active state
+        // Independent device back key handler
+(function () {
+  history.pushState({ page: "fareCalc" }, "", location.href);
 
-  window.addEventListener("popstate", function (event) {
-    if (event.state && event.state.page === "fareCalc") {
-      handleDeviceBack();
-      history.pushState({ page: "fareCalc" }, "", ""); // Re-push state to trap again
+  window.addEventListener("popstate", function () {
+    const fare = localStorage.getItem("finalFare");
+    if (!fare) {
+      const goBack = confirm("Fare not calculated yet. Go back to home?");
+      if (goBack) {
+        window.location.href = "index.html";
+      } else {
+        // Push state again to trap user
+        history.pushState({ page: "fareCalc" }, "", location.href);
+      }
+    } else {
+      window.location.href = "index.html";
     }
   });
-                   }
-  // Run once on page load
-  setupBackHandler();
-                                                  
+})();                                          
 </script></body>
 </html>
