@@ -164,12 +164,11 @@
       <button onclick="calculateExtendedFare()">Calculate & Save</button>
     </div>
   </div>
-
 <script>
 let selectedService = '';
+let fareCalculated = false;
 const finalTime = localStorage.getItem('finalTime') || '00:00:00';
 const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
-let fareCalculated = false;
 
 const serviceCategories = {
   bolt: ['Economy', 'Comfort', 'Executive'],
@@ -266,16 +265,28 @@ function closeOverlay() {
   document.getElementById('fareOverlay').style.display = 'none';
 }
 
-// BACK BUTTON BLOCKING LOGIC
-history.pushState(null, null, location.href);
-window.addEventListener('popstate', function (event) {
+// ✅ Persistent Back Button Trap
+function trapBackButton() {
+  history.pushState(null, null, location.href);
+}
+trapBackButton(); // Initial push
+
+window.addEventListener("popstate", function () {
   if (!fareCalculated) {
-    alert("Please calculate the fare before exiting.");
-    history.pushState(null, null, location.href); // block again
+    alert("Please calculate fare before exiting.");
+    trapBackButton(); // Re-push to block again
   } else {
-    window.location.href = "index.html"; // allow
+    window.location.href = "index.html";
+  }
+});
+
+// Reload edge case: reapply trap
+window.addEventListener("pageshow", function (e) {
+  if (e.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    trapBackButton();
   }
 });
 </script>
+
 </body>
         </html>
