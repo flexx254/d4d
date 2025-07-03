@@ -337,40 +337,74 @@ if (messages.length > 0) {
   });
   document.getElementById("overlay-wrapper").style.display = "flex";
 }
+  
   let fareCalculated = false;
 
-  // Trap the back button
+  // Back button trap
   history.pushState({ page: "fareCalc" }, "", "");
   window.addEventListener("popstate", function (event) {
     if (!fareCalculated) {
       alert("Please calculate the fare before exiting.");
-      history.pushState({ page: "fareCalc" }, "", ""); // Block back again
+      history.pushState({ page: "fareCalc" }, "", "");
     } else {
       window.location.href = "https://flexx254.github.io/d4d/";
     }
   });
 
-  // Set flag when fare is calculated
+  // Mark fare as calculated
   function markFareAsCalculated() {
     fareCalculated = true;
   }
 
-  // Call it inside both fare calculation functions
+  // Update the standard fare button to include markFareAsCalculated
+  const originalFareCalc = document.getElementById("calculateBtn").onclick;
   document.getElementById("calculateBtn").addEventListener("click", () => {
-    // ... your existing fare calculation logic ...
-    markFareAsCalculated(); // ✅ Add this line
+    markFareAsCalculated();
   });
 
+  // Updated extended fare calculator with markFareAsCalculated()
   function calculateExtendedFare() {
-    // ... your existing extended fare calculation logic ...
-    markFareAsCalculated(); // ✅ Add this line
+    const baseFare = parseFloat(document.getElementById("extBase").value);
+    const perKm = parseFloat(document.getElementById("extPerKm").value);
+    const perMin = parseFloat(document.getElementById("extPerMin").value);
+    const minFare = parseFloat(document.getElementById("extMinFare").value);
+    const minKm = parseFloat(document.getElementById("extMinKm").value);
+    const [hh, mm, ss] = finalTime.split(":").map(Number);
+    const totalMinutes = hh * 60 + mm + ss / 60;
+    const totalKm = finalDistance;
+
+    if ([baseFare, perKm, perMin, minFare, minKm].some(isNaN)) return alert("Please fill all fields.");
+
+    let fare = baseFare + totalKm * perKm + totalMinutes * perMin;
+    if (totalKm < minKm || fare < minFare) fare = minFare;
+    const finalFare = fare.toFixed(2);
+    const label = `Extended KES ${finalFare}`;
+
+    localStorage.setItem('finalFare', finalFare);
+    localStorage.setItem('finalFareLabel', label);
+
+    const trips = JSON.parse(localStorage.getItem('trips')) || [];
+    if (trips.length > 0) {
+      const lastTrip = trips[trips.length - 1];
+      lastTrip.fare = finalFare;
+      lastTrip.app = 'extended';
+      trips[trips.length - 1] = lastTrip;
+      localStorage.setItem('trips', JSON.stringify(trips));
+    }
+
+    document.getElementById("extendedFareOverlay").style.display = "none";
+    document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
+    document.getElementById("fareOverlay").style.display = "flex";
+
+    markFareAsCalculated(); // ✅ Set the flag after successful calc
   }
 
-  // Optional: Handle Android/iOS back-forward cache (pageshow)
+  // Handle back-forward cache edge case
   window.addEventListener("pageshow", function (event) {
     if (event.persisted && !fareCalculated) {
       window.location.href = "https://flexx254.github.io/d4d/";
     }
   });
+
 </script></body>
 </html>
