@@ -379,23 +379,17 @@ if (trips.length > 0) {
   }
 });
   
-  // Trap back button (mostly Android + Desktop)
+
   history.pushState(null, '', location.href);
+
   window.addEventListener('popstate', function () {
-    const confirmExit = confirm('Are you sure you want to close this page?');
-    if (confirmExit) {
+    const stay = confirm("This page can't go back. Do you want to stay?");
+    if (!stay) {
       window.location.href = 'index.html';
     } else {
       history.pushState(null, '', location.href);
     }
   });
-
-  // Prompt on page unload (partial iOS support)
-  window.onbeforeunload = function (e) {
-    e.preventDefault();
-    e.returnValue = '';
-  };
-
 
 </script>
 </body>
