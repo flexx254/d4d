@@ -370,18 +370,6 @@ function handleBackButtonClick() {
 
 
 
-   
-  // Handles redirect when the back button is pressed
-  function handleDeviceBack() {
-    const fare = localStorage.getItem("finalFare");
-    if (!fare) {
-      if (confirm("Fare not calculated yet. Go back to home?")) {
-        window.location.href = "index.html";
-      }
-    } else {
-      window.location.href = "index.html";
-    }
-  }
 
    
 
@@ -407,7 +395,7 @@ function handleBackButtonClick() {
 
     window.addEventListener("popstate", (event) => {
       if (event.state && event.state.page === "fareCalc") {
-        confirmAndGoHome();
+        handleBackButtonClick();
       }
     });
   }
