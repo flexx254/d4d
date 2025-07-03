@@ -385,8 +385,7 @@ function handleBackButtonClick() {
 
   // Trap browser/hardware back button
   function setupBackHandler() {
-    // Clear history stack manipulation first
-    history.replaceState({ page: "fareCalc" }, ""); // Replace current entry
+    
 
     // Push another to allow back press to trigger popstate
     setTimeout(() => {
@@ -405,8 +404,11 @@ function handleBackButtonClick() {
     confirmAndGoHome();
   }
 
-  // Initialize on load
+  window.onload = () => {
+  // This gives your handler time to set state correctly after full load
+  history.pushState({ page: "fareCalc" }, "", "");
   setupBackHandler();
+};
                           
 </script></body>
 </html>
