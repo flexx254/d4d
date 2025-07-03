@@ -370,45 +370,14 @@ function handleBackButtonClick() {
 
 
 
-
+function handleBackButtonClick() {
+  window.location.href = "index.html";
+    }
    
 
-  // Back confirmation logic
-  function confirmAndGoHome() {
-    const goBack = confirm("Are you sure you want to return to the home page?");
-    if (goBack) {
-      window.location.href = "index.html";
-    } else {
-      history.pushState({ page: "fareCalc" }, "", ""); // Restore state to trap again
-    }
-  }
+  
 
-  // Trap browser/hardware back button
-  function setupBackHandler() {
-    
-
-    // Push another to allow back press to trigger popstate
-    setTimeout(() => {
-      history.pushState({ page: "fareCalc" }, "");
-    }, 100); // slight delay for stability
-
-    window.addEventListener("popstate", (event) => {
-      if (event.state && event.state.page === "fareCalc") {
-        handleBackButtonClick();
-      }
-    });
-  }
-
-  // ← UI back button
-  function handleBackButtonClick() {
-    confirmAndGoHome();
-  }
-
-  window.onload = () => {
-  // This gives your handler time to set state correctly after full load
-  history.pushState({ page: "fareCalc" }, "", "");
-  setupBackHandler();
-};
+  
                           
 </script></body>
 </html>
