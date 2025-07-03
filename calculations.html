@@ -384,36 +384,41 @@ function handleBackButtonClick() {
   }
 
    
-// Always ask before leaving
-function confirmAndGoHome() {
-  const goBack = confirm("Are you sure you want to return to the home page?");
-  if (goBack) {
-    window.location.href = "index.html";
-  } else {
-    // Restore state to prevent infinite back loop exit
-    history.pushState({ page: "fareCalc" }, "", "");
-  }
-}
 
-// Device/browser back key support
-function setupBackHandler() {
-  // Initial state push to trap back button
-  history.pushState({ page: "fareCalc" }, "", "");
-
-  window.addEventListener("popstate", function (event) {
-    if (event.state && event.state.page === "fareCalc") {
-      confirmAndGoHome();
+  // Back confirmation logic
+  function confirmAndGoHome() {
+    const goBack = confirm("Are you sure you want to return to the home page?");
+    if (goBack) {
+      window.location.href = "index.html";
+    } else {
+      history.pushState({ page: "fareCalc" }, "", ""); // Restore state to trap again
     }
-  });
-}
+  }
 
-// ← Back button click handler
-function handleBackButtonClick() {
-  confirmAndGoHome();
-}
+  // Trap browser/hardware back button
+  function setupBackHandler() {
+    // Clear history stack manipulation first
+    history.replaceState({ page: "fareCalc" }, ""); // Replace current entry
 
-// Run once on page load
-setupBackHandler();
-                           
+    // Push another to allow back press to trigger popstate
+    setTimeout(() => {
+      history.pushState({ page: "fareCalc" }, "");
+    }, 100); // slight delay for stability
+
+    window.addEventListener("popstate", (event) => {
+      if (event.state && event.state.page === "fareCalc") {
+        confirmAndGoHome();
+      }
+    });
+  }
+
+  // ← UI back button
+  function handleBackButtonClick() {
+    confirmAndGoHome();
+  }
+
+  // Initialize on load
+  setupBackHandler();
+                          
 </script></body>
 </html>
