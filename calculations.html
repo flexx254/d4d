@@ -164,11 +164,27 @@
       <button onclick="calculateExtendedFare()">Calculate & Save</button>
     </div>
   </div>
+  
 <script>
 let selectedService = '';
-let fareCalculated = false;
 const finalTime = localStorage.getItem('finalTime') || '00:00:00';
 const finalDistance = parseFloat(localStorage.getItem('finalDistance')) || 0;
+
+// Step 1: Check if user came from trialtrack.html
+const ref = document.referrer;
+const cameFromTrialTrack = ref.includes("trialtrack.html");
+
+// Step 2: If came from trialtrack.html and fare not calculated, stop
+if (cameFromTrialTrack && localStorage.getItem('fareCalculated') !== 'yes') {
+  alert("You must calculate fare before proceeding.");
+  // Prevents continuing (can redirect or keep on page)
+  // Optionally: history.forward(); OR reload page to block UI
+}
+
+// Step 3: Utility - Mark fare as calculated
+function markFareAsCalculated() {
+  localStorage.setItem('fareCalculated', 'yes');
+}
 
 const serviceCategories = {
   bolt: ['Economy', 'Comfort', 'Executive'],
@@ -233,7 +249,7 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
   const finalFare = fare.toFixed(2);
   document.getElementById('fareDisplay').textContent = `KES ${finalFare}`;
   localStorage.setItem('finalFare', finalFare);
-  fareCalculated = true;
+  markFareAsCalculated();
   document.getElementById('fareOverlay').style.display = 'flex';
 });
 
@@ -254,7 +270,7 @@ function calculateExtendedFare() {
   const finalFare = fare.toFixed(2);
 
   localStorage.setItem('finalFare', finalFare);
-  fareCalculated = true;
+  markFareAsCalculated();
 
   document.getElementById("extendedFareOverlay").style.display = "none";
   document.getElementById("fareDisplay").textContent = `KES ${finalFare}`;
@@ -265,28 +281,8 @@ function closeOverlay() {
   document.getElementById('fareOverlay').style.display = 'none';
 }
 
-// ✅ Persistent Back Button Trap
-function trapBackButton() {
-  history.pushState(null, null, location.href);
-}
-trapBackButton(); // Initial push
-
-window.addEventListener("popstate", function () {
-  if (!fareCalculated) {
-    alert("Please calculate fare before exiting.");
-    trapBackButton(); // Re-push to block again
-  } else {
-    window.location.href = "index.html";
-  }
-});
-
-// Reload edge case: reapply trap
-window.addEventListener("pageshow", function (e) {
-  if (e.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-    trapBackButton();
-  }
-});
+// Optional: Clear flag on reload if needed
+// localStorage.removeItem('fareCalculated');
 </script>
-
 </body>
         </html>
