@@ -293,24 +293,31 @@ function closeOverlay() {
   document.getElementById('fareOverlay').style.display = 'none';
 }
 
-// Back key prevention using localStorage
-history.pushState(null, "", location.href);
+// ✅ ADDED: Ensure back restriction is pushed on page load
+window.addEventListener("load", () => {
+  history.pushState(null, "", location.href); // ✅ CHANGED: moved inside load
+
+  // Optional: Show warning immediately
+  if (localStorage.getItem('fareCalculated') !== 'yes') {
+    // alert("You must calculate fare before exiting this page.");
+  }
+
+  // Optional: Uncomment if you want to reset calculation each time
+  // localStorage.removeItem('fareCalculated');
+});
+
+// ✅ UNCHANGED: Back key logic
 window.addEventListener("popstate", function () {
   const fareCalculated = localStorage.getItem('fareCalculated') === 'yes';
   if (!fareCalculated) {
     alert("Please calculate the fare before exiting.");
-    history.pushState(null, "", location.href);
+    history.pushState(null, "", location.href); // Block back
   } else {
-    window.location.href = "index.html";
+    window.location.href = "index.html"; // Allow back
   }
 });
 
-// Clear flag on load if needed (optional reset)
-window.addEventListener("load", () => {
-  // localStorage.removeItem('fareCalculated'); // Uncomment if you want fresh start
-});
-
-// Also for page caching (like iOS)
+// ✅ UNCHANGED: For iOS/Safari page caching
 window.addEventListener("pageshow", function (event) {
   if (event.persisted && localStorage.getItem('fareCalculated') !== 'yes') {
     alert("Please calculate the fare before navigating.");
@@ -318,8 +325,7 @@ window.addEventListener("pageshow", function (event) {
   }
 });
 
-  
-  
+
 
 </script></body>
         </html>
