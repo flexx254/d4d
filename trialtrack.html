@@ -3,6 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>D4D Map Loader</title>
+
+  <script>
+  // Check if this page was opened directly from calculations.html
+  const referrer = document.referrer;
+
+  if (referrer.includes("calculations.html")) {
+    // Create an overlay to block the page
+    document.addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML = ''; // Clear existing content to prevent interaction
+
+      const overlay = document.createElement("div");
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: rgba(0,0,0,0.85);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999;
+      `;
+
+      overlay.innerHTML = `
+        <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; font-family: sans-serif;">
+          <h2 style="color: red;">Access Denied</h2>
+          <p style="font-size: 16px;">You must calculate fare before continuing.</p>
+          <button onclick="window.location.href='calculations.html'" style="
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+          ">Please, Go Back and Calculate Fare</button>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+    });
+
+    // Prevent rest of script from running
+    throw new Error("Blocked navigation from calculations.html");
+  }
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
   <style>
