@@ -134,7 +134,7 @@
       <button onclick="selectService('bolt')">Bolt</button>
       <button onclick="selectService('uber')">Uber</button>
       <button onclick="selectService('faras')">Faras</button>
-      <button onclick="selectService('extended')">Extended</button>
+      <button onclick="selectService('extended')">Extend/Karura</button>
     </div>
     <div id="categoryDropdown" style="display:none;">
       <label for="categorySelect">Select Category:</label>
@@ -220,7 +220,7 @@ function selectService(service) {
 }
 
 document.getElementById('calculateBtn').addEventListener('click', () => {
-  if (!selectedService) return alert('Please select a service.');
+  if (!selectedService) return alert('Please select a platform.');
 
   let fare = 0;
   const [hh, mm, ss] = finalTime.split(':').map(Number);
