@@ -358,6 +358,33 @@ background-color: #4caf50;
       };
     })();
 
+    // Wake Lock logic
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    console.log("✅ Wake Lock active");
+    wakeLock.addEventListener('release', () => {
+      console.log("❌ Wake Lock released");
+    });
+  } catch (err) {
+    console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+  }
+}
+
+// Reapply Wake Lock if lost (e.g., screen turned off or tab hidden and then shown again)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && 'wakeLock' in navigator) {
+    requestWakeLock();
+  }
+});
+
+// Request on page load
+if ('wakeLock' in navigator) {
+  requestWakeLock();
+}
+
     map.on('load', startTracking);
 
     document.getElementById('stopBtn').addEventListener('click', (event) => {
