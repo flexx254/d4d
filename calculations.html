@@ -167,6 +167,10 @@
       <ul id="warning-messages" style="color: #333; font-size: 16px; padding-left: 20px;"></ul>
     </div>
   </div><script>
+
+    if (localStorage.getItem('fareCalculated') !== 'yes') {
+  window.location.href = 'index.html';
+    }
   
 let selectedService = '';
 const finalTime = localStorage.getItem('finalTime') || '00:00:00';
