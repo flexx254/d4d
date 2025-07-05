@@ -131,7 +131,7 @@ background-color: #4caf50;
       <button>Log Out</button>
     </div>
 
-<button onclick="goToCalculations()" style="
+<button id="stopBtn" style="
   background-color: #f44336;
   color: white;
   border: none;
@@ -143,7 +143,6 @@ background-color: #4caf50;
   box-shadow: 0 4px 10px rgba(0,0,0,0.25);
   transition: background-color 0.3s ease;
 ">End Trip</button>
-
 <script>
 function goToCalculations() {
   localStorage.setItem('cameFromTrialTrack', 'true');
