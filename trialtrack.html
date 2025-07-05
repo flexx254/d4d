@@ -407,13 +407,16 @@ if ('wakeLock' in navigator) {
 
     map.on('load', startTracking);
 
-    document.getElementById('stopBtn').addEventListener('click', (event) => {
-      event.preventDefault();
-      stopTracking();
-      setTimeout(() => {
-        window.location.href = 'calculations.html';
-      }, 300);
-    });
+    function goToCalculations() {
+  localStorage.setItem('cameFromTrialTrack', 'true');
+  window.location.href = 'calculations.html';
+}
+
+document.getElementById('stopBtn').addEventListener('click', (event) => {
+  event.preventDefault();
+  stopTracking();
+  setTimeout(goToCalculations, 300);
+});
 
   </script>
 
