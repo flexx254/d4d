@@ -327,19 +327,11 @@ window.addEventListener("pageshow", function (event) {
   }
 });
 
-   const cameFromTrialTrack = localStorage.getItem('cameFromTrialTrack') === 'true';
-  const ref = document.referrer;
-
-  const allowedReferrers = [
-    "https://flexx254.github.io/d4d/trialtrack.html",
-    "https://flexx254.github.io/d4d/"
-  ];
-
-  const isFromAllowedReferrer = allowedReferrers.some(url => ref.includes(url));
-
-  if (!cameFromTrialTrack && !isFromAllowedReferrer) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
-  } 
+   if (localStorage.getItem('cameFromTrialTrack') !== 'true') {
+  window.location.href = 'index.html';
+} else {
+  localStorage.removeItem('cameFromTrialTrack'); // clean up after use
+}
 
 </script></body>
         </html>
