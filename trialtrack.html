@@ -438,10 +438,13 @@ if ('wakeLock' in navigator) {
 
   const path = window.location.pathname;
 
-  // ✅ Redirect trialtrack.html if not from index
-  if (path.includes("trialtrack.html") && !isFromCorrectPageForTrialTrack()) {
-    window.location.href = "https://flexx254.github.io/d4d/index.html";
+if (path.includes("trialtrack.html")) {
+  if (!localStorage.getItem('cameFromIndex')) {
+    window.location.href = "index.html";
+  } else {
+    localStorage.removeItem('cameFromIndex'); // optional
   }
+}
 
   // ✅ Redirect calculations.html if not from index or trialtrack
   if (path.includes("calculations.html") && !isFromCorrectPageForCalculations()) {
