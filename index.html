@@ -171,7 +171,14 @@ background-color: #4caf50;
       <button>Log Out</button>
     </div>
     <div>
-  <button class="start-btn" onclick="location.href='trialtrack.html'">Start</button>
+  <button onclick="goToTrialTrack()">Start Trip</button>
+
+<script>
+function goToTrialTrack() {
+  localStorage.setItem('cameFromIndex', 'true');  // ✅ Set permission flag
+  window.location.href = 'trialtrack.html';       // ✅ Navigate
+}
+</script>
     </div>
   </div>
 
