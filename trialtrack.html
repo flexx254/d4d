@@ -130,7 +130,28 @@ background-color: #4caf50;
       <button>Documents</button>
       <button>Log Out</button>
     </div>
-    <a href="#" class="stop-btn" id="stopBtn">Stop</a>
+
+<button onclick="goToCalculations()" style="
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: bold;
+  width: 180px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  transition: background-color 0.3s ease;
+">End Trip</button>
+
+<script>
+function goToCalculations() {
+  localStorage.setItem('cameFromTrialTrack', 'true');
+  window.location.href = 'calculations.html';
+}
+</script>
+
+    
   </div>
 
   
