@@ -3,19 +3,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fare Calculator</title>
-<script>
-  function cameFromAllowedPage() {
-    const ref = document.referrer;
-    return (
-      ref.includes("index.html") ||
-      ref.includes("trialtrack.html")
-    );
-  }
 
-  if (!cameFromAllowedPage()) {
-    window.location.href = "index.html";
-  }
-</script>
+
   
   <style>
     * { box-sizing: border-box; }
